@@ -15,19 +15,19 @@
 
 ### iFay
 
-代表个人人类原型的 Fay。每个 iFay MUST 有 `host_id` 指向其人类原型。
+代表个人人类原型的 Fay。每个 iFay MUST 有 `human_prime_id` 指向其人类原型。
 
 ### coFay
 
-承担社会公共职能或组织级业务的 Fay。MAY 不绑定单一 `host_id`。
+承担社会公共职能或组织级业务的 Fay。MAY 不绑定单一 `human_prime_id`。
 
 ### Human Prime（人类原型）
 
 Fay 所代表的真实人类或组织。通过 FP（Faying Protocol）与 iFay 建立绑定。蓝图第 1 章详述。
 
-### Host（DID 上下文中的「宿主」）
+### Host（终端宿主 / MCP Host）
 
-注：在 TP 规范的早期版本中，「Host」一词曾用于指代「人类原型」。当前版本统一使用「Human Prime / 人类原型」。**仅当出现在 MCP 架构 `Host → Client → Server` 模型中时**，"Host" 仍保留 MCP 原义，与 TP 的 Human Prime 概念无关。
+终端设备、应用程序或 MCP 架构 `Host → Client → Server` 模型中的运行时容器。注意：在本规范与 iFay 体系中，「Host / 宿主」**严禁**用于指代自然人；自然人统一称为「Human Prime / 人类原型」。
 
 ## 12.2 协议层概念
 
@@ -59,7 +59,7 @@ TP 的核心架构由三层组成（详见 §3.1）：
 
 ### FayIdentity
 
-Fay 的全局唯一身份标识，包含 `fay_id`、`fay_type`、`host_id`、`did`。
+Fay 的全局唯一身份标识，包含 `fay_id`、`fay_type`、`human_prime_id`、`did`。
 
 ### FayProfile
 
@@ -69,7 +69,7 @@ Fay 在会话建立时交换的「名片」，包含身份、能力、共享意�
 
 去中心化标识符。TP 支持三级方法：`did:key`（低）、`did:web`（中）、`did:chain`（高）。
 
-### HostAuthorization
+### PrimeAuthorization
 
 人类原型授予 Fay 的「电子委托书」。引用 FP 协议授权（`fp_authorization_ref`），声明授权范围、操作类型、时长限制。
 

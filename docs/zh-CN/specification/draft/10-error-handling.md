@@ -213,9 +213,9 @@ TP 的错误处理设计原则：
 | TP-ID004 | Retriable | 检测到重放 |
 | TP-ID005 | Negotiable | 时间戳超出窗口 |
 | TP-ID006 | Terminal | payload.identity 与 sender 不一致 |
-| TP-ID007 | Negotiable | HostAuthorization 缺失 |
+| TP-ID007 | Negotiable | PrimeAuthorization 缺失 |
 | TP-ID008 | Negotiable | fp_authorization_ref 无效 |
-| TP-ID009 | Negotiable | 操作超出 HostAuthorization 范围 |
+| TP-ID009 | Negotiable | 操作超出 PrimeAuthorization 范围 |
 | TP-ID010 | Negotiable | 一致性级别声明不匹配 |
 
 ### 共享语境层（TP-CTX0XX）

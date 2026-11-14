@@ -36,7 +36,7 @@
 | `CapabilityDescriptor` | §4.3.4 | `$defs.CapabilityDescriptor` | `CapabilityDescriptor` |
 | `SharingWillingness` | §4.3.4 | `$defs.SharingWillingness` | `SharingWillingness` |
 | `FayStatus` | §4.3.4 | `$defs.FayStatus` | `FayStatus` |
-| `HostAuthorization` | §4.4 | `$defs.HostAuthorization` | `HostAuthorization` |
+| `PrimeAuthorization` | §4.4 | `$defs.PrimeAuthorization` | `PrimeAuthorization` |
 | `AuthorizationRestriction` | §4.4 | `$defs.AuthorizationRestriction` | `AuthorizationRestriction` |
 
 ### 11.3.2 共享语境层
@@ -72,7 +72,7 @@
 | `ConsultationRequest` | §6.6 | `$defs.ConsultationRequest` | `ConsultationRequest` |
 | `ConsultationResponse` | §6.6 | `$defs.ConsultationResponse` | `ConsultationResponse` |
 | `AuthorizationScope` | §6.6.2 | `$defs.AuthorizationScope` | `AuthorizationScope` |
-| `HostDelegation` | §6.6.2 | `$defs.HostDelegation` | `HostDelegation` |
+| `PrimeDelegation` | §6.6.2 | `$defs.PrimeDelegation` | `PrimeDelegation` |
 | `CallbackConfig` | §6.6.3 | `$defs.CallbackConfig` | `CallbackConfig` |
 | `RetryPolicy` | §6.6.3 | `$defs.RetryPolicy` | `RetryPolicy` |
 

@@ -41,7 +41,7 @@ graph TB
 
 回答：**「你是谁？你代表谁？」**
 
-- **核心数据结构**：`FayIdentity`、`DIDIdentifier`、`FayProfile`、`HostAuthorization`
+- **核心数据结构**：`FayIdentity`、`DIDIdentifier`、`FayProfile`、`PrimeAuthorization`
 - **核心契约**：每个 Fay MUST 有可加密验证的身份；每个代表人类原型行事的 iFay MUST 携带 FP 授权引用。
 - **详见**：第 04 章
 
@@ -174,12 +174,12 @@ sequenceDiagram
 graph TB
     subgraph "Fay A 域"
         FPA["FayProfile A"]
-        HAA["HostAuthorization A<br/>(引用 FP)"]
+        HAA["PrimeAuthorization A<br/>(引用 FP)"]
     end
 
     subgraph "Fay B 域"
         FPB["FayProfile B"]
-        HAB["HostAuthorization B<br/>(引用 FP)"]
+        HAB["PrimeAuthorization B<br/>(引用 FP)"]
     end
 
     PC["ProtocolContract<br/>(协商结果)"]
@@ -208,7 +208,7 @@ graph TB
 
 关键关系：
 
-- 每个 `FayProfile` 必须引用其 `HostAuthorization`（iFay 必需，coFay 视场景）
+- 每个 `FayProfile` 必须引用其 `PrimeAuthorization`（iFay 必需，coFay 视场景）
 - `ProtocolContract` 是会话级元数据，约束所有后续消息
 - `SharedContext` 是资源挂载点，`Goal` 通过 `context_ref` 关联
 - `CognitiveResource` 通过 `MountedResource` 挂载到 SharedContext
@@ -222,7 +222,7 @@ graph TB
 | 共享认知优于消息传递 | 认知分享层：`SharedContext` 提供长期挂载空间，避免反复序列化 |
 | 传输无关性 | `MessageEnvelope` 与传输绑定层解耦（§09） |
 | 自适应协议协商 | 协议协商层：`ProtocolContract` 协商三级通信能力（§08） |
-| 人类原型主权隐私 | 身份层 `HostAuthorization` + 安全层 `EncryptedPayload` + `SelectiveDisclosure` |
+| 人类原型主权隐私 | 身份层 `PrimeAuthorization` + 安全层 `EncryptedPayload` + `SelectiveDisclosure` |
 | 可审计信任边界 | 安全层全局审计要求 + `CallbackCredential` 凭证体系 |
 
 ## 3.7 与姊妹协议的边界
@@ -231,8 +231,8 @@ TP 在 iFay 协议体系中专注于 **Fay ↔ Fay 通信**。与姊妹协议的
 
 | 边界 | TP 中的引用 | 由谁定义 |
 |------|------------|---------|
-| 人类原型 → iFay 身份绑定 | `FayIdentity.host_id` | FP（Faying Protocol） |
-| 人类原型 → iFay 授权 | `HostAuthorization.fp_authorization_ref` | FP |
+| 人类原型 → iFay 身份绑定 | `FayIdentity.human_prime_id` | FP（Faying Protocol） |
+| 人类原型 → iFay 授权 | `PrimeAuthorization.fp_authorization_ref` | FP |
 | 人类原型 ↔ Fay 自然语言 | 不在 TP 内 | ICP（Interactive Conversation Protocol） |
 | Fay → 硬件接管 | 不在 TP 内 | CAP（Control Authority Protocol） |
 | 硬件 → Fay 数据流 | 可挂载为 `environment_context` 资源 | DTP（Data Tunnel Protocol） |
@@ -244,7 +244,7 @@ TP 引用其他协议的产物（如 FP 授权）但不规定其内部细节；�
 
 各层与横切关注点的详细规范如下：
 
-- **§04** 身份辨识层：DID 验证细节、`FayProfile` 交换流程、`HostAuthorization` 验证
+- **§04** 身份辨识层：DID 验证细节、`FayProfile` 交换流程、`PrimeAuthorization` 验证
 - **§05** 认知分享层：`SharedContext` 状态机、资源挂载语义、ACL 执行
 - **§06** 目标协商层：`Goal` 状态机、子目标 DAG 规则、咨询模式
 - **§07** 隐私与安全：加密算法选择、凭证签发与撤销、审计字段

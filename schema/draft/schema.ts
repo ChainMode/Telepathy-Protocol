@@ -34,7 +34,7 @@ export type JSONSchema = Record<string, unknown>;
 export interface FayIdentity {
   fay_id: string;                    // 全局唯一标识符
   fay_type: "iFay" | "coFay";       // Fay 类型
-  host_id?: string;                  // 宿主标识（iFay 时 MUST 存在）
+  human_prime_id?: string;                  // 人类原型标识（iFay 时 MUST 存在）
   did: DIDIdentifier;               // DID 标识符
 }
 
@@ -60,7 +60,7 @@ export interface FayProfile {
   capabilities: CapabilityDescriptor[];  // 能力描述列表
   sharing_willingness: SharingWillingness;  // 共享意愿
   status: FayStatus;                 // 当前运行状态
-  host_authorization: HostAuthorization;  // 宿主授权边界
+  prime_authorization: PrimeAuthorization;  // 人类原型授权边界
   conformance_level?: "tp_core" | "tp_secure" | "tp_full";  // 一致性级别声明
   json_ld_context?: string;          // 可选 JSON-LD 语义标注
 }
@@ -71,7 +71,7 @@ export interface CapabilityDescriptor {
   version: string;                   // semver
   input_schema: JSONSchema;
   output_schema: JSONSchema;
-  access_level: "public" | "authenticated" | "authorized" | "host_delegated";
+  access_level: "public" | "authenticated" | "authorized" | "prime_delegated";
   description?: string;
   tags?: string[];                   // 语义标签
 }
@@ -88,7 +88,7 @@ export interface FayStatus {
   last_active: string;               // ISO 8601
 }
 
-export interface HostAuthorization {
+export interface PrimeAuthorization {
   fp_authorization_ref: string;      // FP 协议授权引用
   authorized_resource_types: CognitiveResourceType[];
   authorized_operations: string[];
@@ -336,11 +336,11 @@ export interface ConsultationResponse {
 
 export interface AuthorizationScope {
   required_permissions: string[];
-  host_delegation?: HostDelegation;
+  prime_delegation?: PrimeDelegation;
 }
 
-export interface HostDelegation {
-  host_id: string;
+export interface PrimeDelegation {
+  human_prime_id: string;
   delegated_permissions: string[];
   fp_authorization_ref: string;
 }

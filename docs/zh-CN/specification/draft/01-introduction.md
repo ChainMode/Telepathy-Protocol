@@ -28,6 +28,11 @@
 
 TP 在协议消息中**引用**这些姊妹协议的产物（如 FP 授权引用），但不规定它们的内部细节。
 
+### 1.2.3 TP 1.0 MVP 与研究轨道边界
+
+- **TP 1.0 MVP 规范边界**：基于**显式消息 Schema**（JSON Schema / TypeScript 类型定义）+ **共享本体与协议契约协商**（`ProtocolContract`）+ **强制结构化文本降级兜底**（Structured Text Fallback），保障异构模型与异构 Agent 运行时之间的确定性互操作与人类原型可审计性。
+- **研究轨道（Research Track）**：跨模型原生潜向量传输（Latent Vector Transfer）依赖特定基座模型权重空间对齐，不纳入 TP 1.0 一致性合规强制要求，作为实验性扩展独立演进。
+
 ## 1.3 读者对象
 
 - **协议实现者**：构建 TP SDK、桥接器、运行时的工程师
@@ -79,7 +84,7 @@ TP 在协议消息中**引用**这些姊妹协议的产物（如 FP 授权引用
 | 关联 ID | UUID v4 或 v7 | 同上 |
 | 时间戳 | ISO 8601，UTC，毫秒精度 | `2026-05-27T08:30:00.000Z` |
 | 持续时间 | ISO 8601 duration | `PT15M`（15 分钟） |
-| 字段名 | `snake_case` | `host_authorization`、`mounted_resources` |
+| 字段名 | `snake_case` | `prime_authorization`、`mounted_resources` |
 
 ### 1.5.4 版本标注
 

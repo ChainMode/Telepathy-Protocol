@@ -213,7 +213,7 @@ stateDiagram-v2
 - `required_info_schema`：期望响应数据的 schema
 - `authorization_scope`：所需权限范围
 
-`tp_secure` 起 MUST 在 `authorization_scope.host_delegation` 中携带 `fp_authorization_ref`。
+`tp_secure` 起 MUST 在 `authorization_scope.prime_delegation` 中携带 `fp_authorization_ref`。
 
 ### 6.6.3 同步与异步响应
 

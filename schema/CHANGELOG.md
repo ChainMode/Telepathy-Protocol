@@ -25,13 +25,13 @@ Each version directory (`schema/{version}/`) contains three synchronized files:
 
 ## [draft] — 2025-04-04
 
-Initial schema definition for the Telepathy Protocol, derived from the
-[telepathy-protocol design document](../.kiro/specs/telepathy-protocol/design.md).
+Initial schema definition for the Telepathy Protocol, aligned with the
+[Telepathy Protocol draft specification](../docs/zh-CN/specification/draft/README.md).
 
 ### Added
 
 **Identity**
-- `FayIdentifier` — Identifies a Fay participant (iFay or coFay) with optional host binding.
+- `FayIdentifier` — Identifies a Fay participant (iFay or coFay) with optional Human Prime binding.
 
 **Intent & Parameters**
 - `Intent` — Core payload describing the communication purpose of a Fay.
@@ -53,7 +53,7 @@ Initial schema definition for the Telepathy Protocol, derived from the
 - `SharedStateRef` — Reference to a shared state resource with access mode control.
 
 **Encryption & Privacy**
-- `EncryptedPayload` — Encrypted structure for transmitting Host privacy data.
+- `EncryptedPayload` — Encrypted structure for transmitting Human Prime privacy data.
 - `KeyExchangeInfo` — Key exchange information for hybrid encryption (RSA-OAEP, ECDH-P256, X25519).
 - `SelectiveDisclosure` — Controls which fields of encrypted data may be disclosed.
 
@@ -67,7 +67,7 @@ Initial schema definition for the Telepathy Protocol, derived from the
 
 **Authorization**
 - `AuthorizationScope` — Authorization scope for consultation requests.
-- `HostDelegation` — Host-delegated authorization details with FP protocol reference.
+- `PrimeDelegation` — Human Prime-delegated authorization details with FP protocol reference.
 
 **Message Envelope**
 - `MessageEnvelope` — Outer wrapper for all TP communication (routing, tracing, version control).

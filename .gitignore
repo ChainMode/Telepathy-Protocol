@@ -33,3 +33,7 @@ openspec/
 .githooks/
 decisions/
 AGENTS.md
+
+# iAccord 本体/安装包:本体与 *.tar.gz 安装包只放体系根 .iaccord/(不在任何 repo 内)。
+# 这条是防御性的 —— 万一本仓将来自带一份 .iaccord/,也不得进 github repo。
+.iaccord/

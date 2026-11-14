@@ -179,7 +179,7 @@ stateDiagram-v2
 2. **授权范围内**：拥有方 MUST 是 SharedContext 的参与方之一
 3. **挂载点唯一**：同一 SharedContext 内 `mount_point` 字符串 MUST 唯一；冲突返回 `TP-CTX014`
 4. **资源类型已声明**：拥有方的 `FayProfile.sharing_willingness.shareable_resource_types` MUST 包含该资源类型
-5. **人类原型授权范围内**：如拥有方为 iFay，资源类型 MUST 在其 `HostAuthorization.authorized_resource_types` 内
+5. **人类原型授权范围内**：如拥有方为 iFay，资源类型 MUST 在其 `PrimeAuthorization.authorized_resource_types` 内
 
 挂载点路径采用类 Unix 文件系统约定，如 `/medical/diagnosis-2026/codes`、`/views/contract-doc/annotations`。
 
@@ -426,6 +426,6 @@ stateDiagram-v2
 | `TP-CTX013` | ReferenceContent 校验和不匹配 |
 | `TP-CTX014` | 挂载点冲突（已存在） |
 | `TP-CTX015` | 资源类型未在 sharing_willingness 中声明 |
-| `TP-CTX016` | 资源类型超出 HostAuthorization 范围 |
+| `TP-CTX016` | 资源类型超出 PrimeAuthorization 范围 |
 | `TP-CTX020` | 同步冲突无法自动解决 |
 | `TP-CTX021` | 同步版本断层（需重同步） |

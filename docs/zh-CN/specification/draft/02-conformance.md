@@ -75,8 +75,8 @@ TP 实现按所支持的功能集划分为三个一致性级别。Fay 通过 `Fa
 
 **身份辨识层**
 - MUST 支持 `did:web` 方法
-- MUST 验证 `HostAuthorization.fp_authorization_ref` 的可验证性（向 FP 协议查询）
-- MUST 拒绝 `host_authorization` 缺失或过期的 iFay 请求
+- MUST 验证 `PrimeAuthorization.fp_authorization_ref` 的可验证性（向 FP 协议查询）
+- MUST 拒绝 `prime_authorization` 缺失或过期的 iFay 请求
 
 **认知分享层**
 - MUST 支持 `collaborative_space` 模式

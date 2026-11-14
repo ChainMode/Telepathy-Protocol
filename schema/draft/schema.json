@@ -71,7 +71,7 @@
     },
     "FayIdentity": {
       "type": "object",
-      "description": "Fay identity — globally unique identifier with DID verification and Host attribution.",
+      "description": "Fay identity — globally unique identifier with DID verification and Human Prime attribution.",
       "properties": {
         "fay_id": {
           "type": "string",
@@ -84,9 +84,9 @@
             "coFay"
           ]
         },
-        "host_id": {
+        "human_prime_id": {
           "type": "string",
-          "description": "Host identifier (MUST be present when fay_type is iFay)."
+          "description": "Human Prime identifier (MUST be present when fay_type is iFay)."
         },
         "did": {
           "$ref": "#/$defs/DIDIdentifier"
@@ -106,7 +106,7 @@
       },
       "then": {
         "required": [
-          "host_id"
+          "human_prime_id"
         ]
       },
       "additionalProperties": false
@@ -147,7 +147,7 @@
             "public",
             "authenticated",
             "authorized",
-            "host_delegated"
+            "prime_delegated"
           ]
         },
         "description": {
@@ -233,7 +233,7 @@
     },
     "AuthorizationRestriction": {
       "type": "object",
-      "description": "A restriction on Host authorization.",
+      "description": "A restriction on Human Prime authorization.",
       "properties": {
         "restriction_type": {
           "type": "string",
@@ -249,9 +249,9 @@
       ],
       "additionalProperties": false
     },
-    "HostAuthorization": {
+    "PrimeAuthorization": {
       "type": "object",
-      "description": "Boundary of what the Host has authorized this Fay to do and share.",
+      "description": "Boundary of what the Human Prime has authorized this Fay to do and share.",
       "properties": {
         "fp_authorization_ref": {
           "type": "string",
@@ -308,8 +308,8 @@
         "status": {
           "$ref": "#/$defs/FayStatus"
         },
-        "host_authorization": {
-          "$ref": "#/$defs/HostAuthorization"
+        "prime_authorization": {
+          "$ref": "#/$defs/PrimeAuthorization"
         },
         "conformance_level": {
           "type": "string",
@@ -330,7 +330,7 @@
         "capabilities",
         "sharing_willingness",
         "status",
-        "host_authorization"
+        "prime_authorization"
       ],
       "additionalProperties": false
     },
@@ -734,7 +734,7 @@
     },
     "EncryptedPayload": {
       "type": "object",
-      "description": "Encrypted payload for transmitting Host privacy data.",
+      "description": "Encrypted payload for transmitting Human Prime privacy data.",
       "properties": {
         "encryption_algorithm": {
           "type": "string",
@@ -1055,11 +1055,11 @@
       ],
       "additionalProperties": false
     },
-    "HostDelegation": {
+    "PrimeDelegation": {
       "type": "object",
-      "description": "Host delegation information.",
+      "description": "Human Prime delegation information.",
       "properties": {
-        "host_id": {
+        "human_prime_id": {
           "type": "string"
         },
         "delegated_permissions": {
@@ -1073,7 +1073,7 @@
         }
       },
       "required": [
-        "host_id",
+        "human_prime_id",
         "delegated_permissions",
         "fp_authorization_ref"
       ],
@@ -1089,8 +1089,8 @@
             "type": "string"
           }
         },
-        "host_delegation": {
-          "$ref": "#/$defs/HostDelegation"
+        "prime_delegation": {
+          "$ref": "#/$defs/PrimeDelegation"
         }
       },
       "required": [

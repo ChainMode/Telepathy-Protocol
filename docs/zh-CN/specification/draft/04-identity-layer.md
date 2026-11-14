@@ -8,7 +8,7 @@
 
 - Fay 身份的格式与 DID 验证（§4.2）
 - `FayProfile` 在会话建立阶段的交换流程（§4.3）
-- 人类原型授权（`HostAuthorization`）的验证规则（§4.4）
+- 人类原型授权（`PrimeAuthorization`）的验证规则（§4.4）
 - 身份层错误处理（§4.5）
 
 ## 4.2 Fay 身份与 DID 验证
@@ -21,13 +21,13 @@
 |------|------|
 | `fay_id` | MUST 全局唯一；MUST 仅包含 URI 安全字符（`[A-Za-z0-9\-._~]`）；长度 1-256 字节 |
 | `fay_type` | MUST 是 `iFay` 或 `coFay` |
-| `host_id` | 当 `fay_type = iFay` 时 MUST 存在；当 `fay_type = coFay` 时 MAY 存在 |
+| `human_prime_id` | 当 `fay_type = iFay` 时 MUST 存在；当 `fay_type = coFay` 时 MAY 存在 |
 | `did` | MUST 存在；其 `proof.proof_value` MUST 对应于 `did.value` 描述的密钥 |
 
 **约束解释**：
 
-- `coFay` 可以无 `host_id`，因为承担社会公共职能的 coFay（如医院 coFay、社保 coFay）的所有权可能是组织级而非个人级。
-- 如 coFay 提供 `host_id`，该字段 MUST 标识负责该 coFay 运维的组织或个人。
+- `coFay` 可以无 `human_prime_id`，因为承担社会公共职能的 coFay（如医院 coFay、社保 coFay）的所有权可能是组织级而非个人级。
+- 如 coFay 提供 `human_prime_id`，该字段 MUST 标识负责该 coFay 运维的组织或个人。
 
 ### 4.2.2 DID 方法分级
 
@@ -70,7 +70,7 @@ TP 支持三种 DID 方法，按信任等级递增：
 `FayProfile` MUST 在以下时机交换：
 
 - 会话建立的第一次握手（在 `negotiate_request` 之前或同时）
-- `FayProfile` 的关键字段（`capabilities`、`host_authorization`、`conformance_level`）发生变更后
+- `FayProfile` 的关键字段（`capabilities`、`prime_authorization`、`conformance_level`）发生变更后
 
 ### 4.3.2 交换序列
 
@@ -119,17 +119,17 @@ sequenceDiagram
 
 1. `FayProfile.identity` 与 `MessageEnvelope.sender` **完全一致**——任何不一致 MUST 返回 `TP-ID006`。
 2. `FayProfile.capabilities` 中的每个 `CapabilityDescriptor` 的 `version` 字段 MUST 是有效 SemVer 字符串。
-3. 如 `FayProfile.identity.fay_type = iFay`，`FayProfile.host_authorization` MUST 存在且通过 §4.4 的验证。
+3. 如 `FayProfile.identity.fay_type = iFay`，`FayProfile.prime_authorization` MUST 存在且通过 §4.4 的验证。
 
 ## 4.4 人类原型授权验证
 
-### 4.4.1 HostAuthorization 的角色
+### 4.4.1 PrimeAuthorization 的角色
 
-`HostAuthorization` 是 iFay 携带的「委托书」。它声明：「我（Fay）已被人类原型 X 授权，可执行 Y 类操作，分享 Z 类资源，期限不超过 D。」
+`PrimeAuthorization` 是 iFay 携带的「委托书」。它声明：「我（Fay）已被人类原型 X 授权，可执行 Y 类操作，分享 Z 类资源，期限不超过 D。」
 
-接收方 MUST 在以下时机验证 `HostAuthorization`：
+接收方 MUST 在以下时机验证 `PrimeAuthorization`：
 
-- 收到 `profile_exchange` 时，对 `iFay` 的 `host_authorization` 字段
+- 收到 `profile_exchange` 时，对 `iFay` 的 `prime_authorization` 字段
 - 任何 `goal_propose`、`resource_mount`、`consultation_request` 等操作消息到达时（如这些操作涉及人类原型隐私数据）
 
 ### 4.4.2 验证规则（tp_secure 及以上）
@@ -157,11 +157,11 @@ sequenceDiagram
 
 ### 4.4.4 coFay 的特殊情况
 
-`coFay` 通常不携带 `host_authorization`（无个人人类原型）。但当 coFay 处理涉及他人人类原型的隐私数据时（如医院 coFay 处理患者数据），coFay 自身的 `HostAuthorization` MUST 描述其作为受托方的授权范围。
+`coFay` 通常不携带 `prime_authorization`（无个人人类原型）。但当 coFay 处理涉及他人人类原型的隐私数据时（如医院 coFay 处理患者数据），coFay 自身的 `PrimeAuthorization` MUST 描述其作为受托方的授权范围。
 
 具体地，coFay 在转发或处理来自 iFay 的人类原型隐私数据时：
 
-- coFay MUST 验证收到的 iFay 的 `HostAuthorization`（按 §4.4.2）
+- coFay MUST 验证收到的 iFay 的 `PrimeAuthorization`（按 §4.4.2）
 - coFay MUST NOT 超出该授权范围使用数据
 - coFay MUST 在审计日志（详见 §07.4）中记录授权来源与使用范围
 
@@ -186,7 +186,7 @@ sequenceDiagram
   "sender": {
     "fay_id": "fay:patient-zhang-3389",
     "fay_type": "iFay",
-    "host_id": "host:zhang-san-natural-person",
+    "human_prime_id": "hid_zhangsan234567abcdef",
     "did": {
       "method": "did:web",
       "value": "did:web:zhang-3389.fay.example.com",
@@ -254,7 +254,7 @@ sequenceDiagram
         "version": "1.0.0",
         "input_schema": { /* ... */ },
         "output_schema": { /* ... */ },
-        "access_level": "host_delegated"
+        "access_level": "prime_delegated"
       }
     ],
     "sharing_willingness": {
@@ -267,7 +267,7 @@ sequenceDiagram
       "current_contexts": 0,
       "last_active": "2026-05-27T08:30:02.000Z"
     },
-    "host_authorization": {
+    "prime_authorization": {
       "fp_authorization_ref": "fp:auth:zhang-san:hospital-east:claim-2026-001",
       "authorized_resource_types": ["memory_fragment"],
       "authorized_operations": ["read", "disclose_diagnosis"],
@@ -289,7 +289,7 @@ sequenceDiagram
 
 1. 验证 `MessageEnvelope` 签名（§4.2.3）
 2. 验证 `payload.identity == sender`（§4.3.4）
-3. 由于 `payload.identity.fay_type = "iFay"`，验证 `host_authorization`（§4.4.2）：
+3. 由于 `payload.identity.fay_type = "iFay"`，验证 `prime_authorization`（§4.4.2）：
    - 调用 FP 端点查询 `fp:auth:zhang-san:hospital-east:claim-2026-001` 状态 → `active`
    - 记录授权范围：`memory_fragment` + `read/disclose_diagnosis` + 不超过 2 小时
 4. 接受 A 的 `profile_exchange`，进入协议协商阶段
@@ -306,7 +306,7 @@ sequenceDiagram
 | `TP-ID004` | 检测到重放（重复 `message_id`） |
 | `TP-ID005` | 时间戳超出允许窗口 |
 | `TP-ID006` | `payload.identity` 与 `sender` 不一致 |
-| `TP-ID007` | `HostAuthorization` 字段缺失（iFay 必需） |
+| `TP-ID007` | `PrimeAuthorization` 字段缺失（iFay 必需） |
 | `TP-ID008` | `fp_authorization_ref` 无效或已撤销 |
-| `TP-ID009` | 操作超出 `HostAuthorization` 范围 |
+| `TP-ID009` | 操作超出 `PrimeAuthorization` 范围 |
 | `TP-ID010` | 一致性级别声明与对方期望不匹配 |

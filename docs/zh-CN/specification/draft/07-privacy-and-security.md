@@ -20,7 +20,7 @@ TP 的核心承诺之一是「人类原型主权隐私」——人类原型对�
 
 1. 任何携带人类原型隐私数据的消息（医疗、财务、身份、生物特征等）
 2. `CognitiveResource.access_policy.requires_encryption = true` 的资源
-3. 包含 `host_authorization` 涉及敏感操作时
+3. 包含 `prime_authorization` 涉及敏感操作时
 4. 跨组织（不同的 coFay 域）传输时
 
 实现 SHOULD 默认对 `iFay` 之间的所有 `payload` 加密——加密总比不加密安全，性能代价通常可接受。
@@ -140,7 +140,7 @@ SelectiveDisclosure {
 | `credential_id` | UUID，全局唯一 |
 | `scope.resources` | 至少 1 项；MUST 是显式列举的资源标识符（不允许通配符） |
 | `scope.operations` | 至少 1 项；MUST 是显式列举的操作（如 `read`, `write`, `disclose_diagnosis`） |
-| `expiration` | ISO 8601；MUST 不超过 `HostAuthorization.max_sharing_duration` |
+| `expiration` | ISO 8601；MUST 不超过 `PrimeAuthorization.max_sharing_duration` |
 | `resource_reference` | 引用具体资源（如 `ctx:xxx/mount-point` 或 `res:xxx`） |
 | `issuer_fay_id` | 签发方 fay_id，MUST 等于资源拥有方 |
 | `encrypted_token` | 实际授权令牌，加密存储 |
@@ -150,7 +150,7 @@ SelectiveDisclosure {
 
 资源拥有方签发凭证时 MUST：
 
-1. 验证请求方 `authorization_scope` 与人类原型 `HostAuthorization` 兼容
+1. 验证请求方 `authorization_scope` 与人类原型 `PrimeAuthorization` 兼容
 2. 生成 `credential_id`（UUID v4 或 v7）
 3. 生成密钥对：使用拥有方私钥签名一个内嵌结构 `{credential_id, scope, expiration, issuer_fay_id, holder_fay_id}`
 4. 用接收方公钥加密签名结果，存入 `encrypted_token`
@@ -175,7 +175,7 @@ SelectiveDisclosure {
 签发方在以下情况 MUST 主动撤销凭证：
 
 - 人类原型撤回授权
-- `HostAuthorization` 被 FP 协议失效
+- `PrimeAuthorization` 被 FP 协议失效
 - 检测到异常使用模式（如频率异常、IP 异常）
 - 业务流程完成（如理赔评估结束）
 
@@ -203,8 +203,8 @@ SelectiveDisclosure {
 | 事件类型 | 触发时机 |
 |---------|---------|
 | `identity_verified` | DID 验证成功 |
-| `host_auth_verified` | HostAuthorization 验证成功 |
-| `host_auth_failed` | HostAuthorization 验证失败 |
+| `prime_auth_verified` | PrimeAuthorization 验证成功 |
+| `prime_auth_failed` | PrimeAuthorization 验证失败 |
 | `context_created` | SharedContext 进入 `active` |
 | `context_state_changed` | SharedContext 状态转换 |
 | `resource_mounted` | 资源挂载 |
@@ -232,7 +232,7 @@ SelectiveDisclosure {
   "operation": "<具体操作>",
   "result": "success | failure",
   "context_ref": "<相关 SharedContext>",
-  "host_authorization_ref": "<相关 FP 授权>",
+  "prime_authorization_ref": "<相关 FP 授权>",
   "details": { /* 事件特定详情 */ }
 }
 ```
