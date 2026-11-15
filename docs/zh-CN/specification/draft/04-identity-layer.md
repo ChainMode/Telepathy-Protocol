@@ -181,7 +181,7 @@ sequenceDiagram
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000001",
   "sender": {
     "fay_id": "fay:patient-zhang-3389",
@@ -220,7 +220,7 @@ sequenceDiagram
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000002",
   "sender": { /* fay:hospital-shanghai-east 完整 FayIdentity */ },
   "receiver": { /* fay:patient-zhang-3389 完整 FayIdentity */ },
@@ -239,7 +239,7 @@ sequenceDiagram
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000003",
   "sender": { /* fay:patient-zhang-3389 */ },
   "receiver": { /* fay:hospital-shanghai-east */ },

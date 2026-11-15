@@ -1,6 +1,55 @@
-# Telepathy Protocol Schema (2025-10-25)
+# Telepathy Protocol 1.0 Schema Reference (Edition 2025-10-25)
 
+> Human-readable documentation for the frozen Telepathy Protocol (`TP/1.0`) wire data structures.
+> Corresponds 1-to-1 with `schemas/tp-1.0.json`, `schema.json`, and `schema.ts`.
 
+---
 
+## 1. Wire Versioning, Identity & Faying Mandate Binding
 
+- **`ProtocolVersion`**: Two-segment `MAJOR.MINOR` wire version (`"1.0"` or qualified `"TP/1.0"`). Three-segment SemVer strings (such as `"1.0.0"`) are invalid and rejected with `TP-VER003`. Major version mismatches return `TP-VER001`.
+- **`FayID`**: Ecosystem-canonical prefixed identifier `^(?:ifay|cofay)_[a-z2-7]{16,64}$` (`Fay = iFay + coFay`).
+- **`CryptoSuite`**: `"Ed25519"` (normative mandatory-to-implement in TP 1.0 over RFC 8785 JCS) and `"ML-DSA-65"` (reserved post-quantum negotiation slot).
+- **`FayIdentity`**: Binds `fay_id`, `fay_type`, `human_prime_id` (mandatory when `fay_type === "iFay"` — `Human Prime` / `人类原型` refers exclusively to natural persons, whereas `Host` / `宿主` refers exclusively to terminal hardware devices or client applications), optional `fp_authorization_ref`, and `DIDIdentifier`.
+- **`PrimeAuthorization` & `PrimeDelegation`**: Bind Fay sharing and consultation boundaries to a Faying Protocol (`FP`) mandate via `fp_authorization_ref`.
 
+---
+
+## 2. Three-Layer Cognitive Exchange Stack & Scientific Boundary
+
+TP 1.0 strictly separates its **Normative Core** from its **Experimental Research Track**:
+
+1. **`CognitiveFrame` (Normative Layer 1 — Explicit Cognitive Frame Schema)**: Structured intent, confidence (`0..1`), assumptions, constraints, typed entities, and `context_refs` bound to a negotiated `ontology_id` + `ontology_version`.
+2. **`OntologyDescriptor` (Normative Layer 2 — Shared Ontology & Codebook Negotiation)**: Exchanged in `FayProfile.supported_ontologies` and bound into `ProtocolContract.shared_ontology` (`ontology_id`, `version`, `codebook_digest`, `max_quantization_loss`).
+3. **`StructuredTextFallbackFrame` (Normative Layer 3 — Mandatory Structured Natural-Language Fallback)**: Automatically activated whenever participants share no compatible ontology (`fallback_reason: "ontology_mismatch"`) or confidence drops below threshold, guaranteeing 100% cross-implementation interoperability and Human Prime auditability.
+4. **`ExperimentalLatentFrame` (Optional Experimental Research Track — Non-Normative)**:TP 1.0 **never** claims lossless raw latent vector transfer across independently trained heterogeneous models. `ExperimentalLatentFrame` (`experimental: true`) is permitted **only** when both peers cryptographically match `base_model_digest` and `adapter_digest` (`ModelHomogeneityAttestation`) **and** attach a non-empty `audit_summary` plus `fallback_frame`.
+
+---
+
+## 3. Cognitive Sharing Layer, SSRF Guards, Revocation & Audit
+
+- **`SharedContext` & `ContextLifecycle`**: 5-state machine (`initializing`, `active`, `syncing`, `suspended`, `terminated`, with `termination_reason` distinguishing `completed`, `expired` -> `TP-CTX002`, and `revoked` -> `TP-CTX003`).
+- **`SyncState` (Deterministic LWW)**: In `collaborative_space` mode, TP 1.0 MVP enforces deterministic `last_writer_wins` convergence ordered by monotonic `(sync_version, updated_at, actor_fay_id)`.
+- **`CognitiveResource` (`InlineContent` / `ReferenceContent` / `DtpTunnelContent`)**:
+  - `inline`: Strictly bounded at `<= 65,536` bytes (64 KiB); larger inline payloads fail with `TP-RES003`.
+  - `reference`: Restricted to `https://` URIs and guarded against SSRF (loopback, RFC 1918 private networks, link-local `169.254.0.0/16` / `fe80::/10`, CGNAT, IPv6 ULA, and `file://` URIs fail with `TP-RES002`).
+  - `dtp_tunnel`: Binds cognitive streams to an encrypted Data Tunnel Protocol (`DTP`) channel.
+- **`ResourceNotification`**: Metadata-only change notification (`content_digest`, `byte_length`, `sync_version`) — never embeds unauthorized raw content.
+- **`EncryptedPayload` & `SelectiveDisclosure`**: Hybrid `X25519` / `ECDH-P256` + `AES-256-GCM` / `ChaCha20-Poly1305` AEAD wrapper with field-level selective disclosure.
+- **`CallbackCredential` & `CredentialRevocation`**: Least-privilege scoped credentials checked for expiration (`TP-C001`), mandatory in-band `credential_revoke` / optional HTTPS `revocation_endpoint` revocation (`TP-C002`), and resource/operation scope (`TP-C003`).
+- **`AuditRecord`**: Content-isolated `SHA-256` hash-chained local audit record (`prev_record_hash` -> `record_hash`) storing `payload_digest` only — zero plaintext payload, keys, or tokens — under Human Prime local retention and compaction sovereignty.
+
+---
+
+## 4. Goal Negotiation Layer & Consultation
+
+- **`Goal` & `SubGoalReference`**: Unifies intent and task execution with bilateral negotiation (`proposed` -> `negotiating` -> `accepted` -> `in_progress` -> `completed` / `failed` / `cancelled`) and acyclic sub-goal DAG enforcement (`TP-GOAL002` on cycle detection). Physical/host device actions attach `cap_handoff_ref` for Control Authority Protocol (`CAP`) evaluation.
+- **`ConsultationRequest` & `ConsultationResponse`**: Supports `PrimeDelegation` (`fp_authorization_ref`), bounded consultation chains (`chained_from`, max depth 5 -> `TP-GOAL020`), and asynchronous `CallbackConfig`.
+
+---
+
+## 5. Protocol Negotiation, Bridges & Message Envelope
+
+- **`ProtocolContract` & `CommunicationTier`**: Negotiates `tier_1_native_tp` vs `tier_3_structured_text_fallback` (`tier_2_ai_generated` is disabled by default as experimental).
+- **`LossMetadata` & `TraceInfo`**: Records `dropped_fields`, `degraded_semantics`, `attribution_preserved`, `reversible`, and `hop_count <= 5` (`TP-TRA001`) across sibling (`FP`, `CAP`, `DTP`, `SSP`, `ICP`) and external (`A2A`, `MCP`) bridges.
+- **`MessageEnvelope` & `TPError`**: Signed via RFC 8785 JCS + `Ed25519` (or negotiated `crypto_suite`), carrying any of the 22 `MessageType` payloads and deterministic `TP-*` error codes.

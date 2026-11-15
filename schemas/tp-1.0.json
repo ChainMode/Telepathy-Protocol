@@ -1,0 +1,2069 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ifay.ai/schemas/tp-1.0.json",
+  "title": "Telepathy Protocol (TP) 1.0 Normative Schema",
+  "description": "Frozen Telepathy Protocol 1.0 JSON Schema (Edition 2025-10-25). Defines the two-segment TP/1.0 wire envelope, FayIdentity with Human Prime attribution and Faying Mandate binding, the 3-layer Normative Cognitive Exchange Stack (Explicit Cognitive Frame Schema, Shared Ontology & Codebook Negotiation, Mandatory Structured Natural-Language Fallback), the gated Experimental Latent Research Track, SharedContext deterministic LWW synchronization, SSRF-guarded CognitiveResource references, CallbackCredential in-band revocation, content-free local hash-chained AuditRecord, Goal DAG & Consultation, and sibling/external bridge loss metadata.",
+  "$defs": {
+    "ProtocolVersion": {
+      "type": "string",
+      "pattern": "^(?:TP\\/)?(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$",
+      "description": "Two-segment TP wire protocol version MAJOR.MINOR (canonical \"1.0\" or qualified \"TP/1.0\"). Three-segment SemVer strings (e.g. \"1.0.0\") are invalid and rejected with TP-VER003."
+    },
+    "FayID": {
+      "type": "string",
+      "pattern": "^(?:ifay|cofay)_[a-z2-7]{16,64}$",
+      "description": "Canonical ecosystem Fay identifier prefixed with ifay_ (individual Fay) or cofay_ (collaborative/organizational Fay) followed by lowercase RFC 4648 base32 characters."
+    },
+    "CryptoSuite": {
+      "type": "string",
+      "enum": [
+        "Ed25519",
+        "ML-DSA-65"
+      ],
+      "description": "Negotiated envelope signature suite. Ed25519 is mandatory-to-implement (MTI) in TP 1.0; ML-DSA-65 is the reserved post-quantum agility slot."
+    },
+    "Sha256Digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Lowercase hexadecimal SHA-256 digest prefixed with sha256:."
+    },
+    "JSONSchema": {
+      "type": "object",
+      "description": "Opaque JSON Schema object.",
+      "additionalProperties": true
+    },
+    "DIDProof": {
+      "type": "object",
+      "description": "DID proof for cryptographic identity verification.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Ed25519Signature2020",
+            "MLDSA65Signature2026",
+            "EcdsaSecp256k1Signature2019"
+          ]
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp."
+        },
+        "verification_method": {
+          "type": "string",
+          "description": "Verification method URI."
+        },
+        "proof_value": {
+          "type": "string",
+          "description": "Base64-encoded signature."
+        }
+      },
+      "required": [
+        "type",
+        "created",
+        "verification_method",
+        "proof_value"
+      ],
+      "additionalProperties": false
+    },
+    "DIDIdentifier": {
+      "type": "object",
+      "description": "DID identifier with method, value, and cryptographic proof.",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "did:key",
+            "did:web",
+            "did:chain"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 8
+        },
+        "proof": {
+          "$ref": "#/$defs/DIDProof"
+        }
+      },
+      "required": [
+        "method",
+        "value",
+        "proof"
+      ],
+      "additionalProperties": false
+    },
+    "FayIdentity": {
+      "type": "object",
+      "description": "Fay identity — globally unique FayID with DID verification, Human Prime attribution, and optional Faying Mandate reference.",
+      "properties": {
+        "fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "fay_type": {
+          "type": "string",
+          "enum": [
+            "iFay",
+            "coFay"
+          ]
+        },
+        "human_prime_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human Prime identifier (MUST be present when fay_type is iFay)."
+        },
+        "fp_authorization_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional Faying Protocol (FP) mandate authorization reference."
+        },
+        "did": {
+          "$ref": "#/$defs/DIDIdentifier"
+        }
+      },
+      "required": [
+        "fay_id",
+        "fay_type",
+        "did"
+      ],
+      "if": {
+        "properties": {
+          "fay_type": {
+            "const": "iFay"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "human_prime_id"
+        ]
+      },
+      "additionalProperties": false
+    },
+    "CognitiveResourceType": {
+      "type": "string",
+      "description": "Enumeration of shareable cognitive resource types.",
+      "enum": [
+        "memory_fragment",
+        "view_state",
+        "reasoning_engine",
+        "environment_context"
+      ]
+    },
+    "CapabilityDescriptor": {
+      "type": "object",
+      "description": "Describes a single capability of a Fay (mappable from SSP Skill Descriptors).",
+      "properties": {
+        "capability_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "description": "Capability version string."
+        },
+        "input_schema": {
+          "$ref": "#/$defs/JSONSchema"
+        },
+        "output_schema": {
+          "$ref": "#/$defs/JSONSchema"
+        },
+        "access_level": {
+          "type": "string",
+          "enum": [
+            "public",
+            "authenticated",
+            "authorized",
+            "prime_delegated"
+          ]
+        },
+        "ssp_skill_ref": {
+          "type": "string",
+          "description": "Optional Skill Sharing Protocol (SSP) canonical skill reference."
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "capability_id",
+        "name",
+        "version",
+        "input_schema",
+        "output_schema",
+        "access_level"
+      ],
+      "additionalProperties": false
+    },
+    "SharingWillingness": {
+      "type": "object",
+      "description": "Declares what cognitive resources a Fay is willing to share.",
+      "properties": {
+        "shareable_resource_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CognitiveResourceType"
+          }
+        },
+        "preferred_mode": {
+          "type": "string",
+          "enum": [
+            "delegated_access",
+            "collaborative_space",
+            "both"
+          ]
+        },
+        "max_concurrent_contexts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "shareable_resource_types",
+        "preferred_mode",
+        "max_concurrent_contexts"
+      ],
+      "additionalProperties": false
+    },
+    "FayStatus": {
+      "type": "object",
+      "description": "Current operational status of a Fay.",
+      "properties": {
+        "availability": {
+          "type": "string",
+          "enum": [
+            "online",
+            "busy",
+            "away",
+            "offline"
+          ]
+        },
+        "current_contexts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "last_active": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "availability",
+        "current_contexts",
+        "last_active"
+      ],
+      "additionalProperties": false
+    },
+    "AuthorizationRestriction": {
+      "type": "object",
+      "description": "An explicit restriction placed by the Human Prime on Fay sharing.",
+      "properties": {
+        "restriction_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "restriction_type",
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "PrimeAuthorization": {
+      "type": "object",
+      "description": "Boundary of what the Human Prime has authorized this Fay to do and share via Faying Protocol.",
+      "properties": {
+        "fp_authorization_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Faying Protocol (FP) mandate authorization reference."
+        },
+        "authorized_resource_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CognitiveResourceType"
+          }
+        },
+        "authorized_operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "max_sharing_duration": {
+          "type": "string",
+          "description": "ISO 8601 duration."
+        },
+        "restrictions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AuthorizationRestriction"
+          }
+        }
+      },
+      "required": [
+        "fp_authorization_ref",
+        "authorized_resource_types",
+        "authorized_operations",
+        "max_sharing_duration",
+        "restrictions"
+      ],
+      "additionalProperties": false
+    },
+    "OntologyDescriptor": {
+      "type": "object",
+      "description": "Shared ontology and codebook version descriptor for TP 1.0 Normative Layer 2 negotiation.",
+      "properties": {
+        "ontology_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "codebook_digest": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "max_quantization_loss": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "ontology_id",
+        "version",
+        "codebook_digest"
+      ],
+      "additionalProperties": false
+    },
+    "ModelHomogeneityAttestation": {
+      "type": "object",
+      "description": "Cryptographic digest attestation required for the optional Experimental Latent Research Track.",
+      "properties": {
+        "base_model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_model_digest": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "adapter_digest": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "projection_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimension": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "base_model_id",
+        "base_model_digest",
+        "adapter_digest",
+        "projection_version",
+        "dimension"
+      ],
+      "additionalProperties": false
+    },
+    "FayProfile": {
+      "type": "object",
+      "description": "Fay profile exchanged during Step 3 of TP session establishment.",
+      "properties": {
+        "identity": {
+          "$ref": "#/$defs/FayIdentity"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CapabilityDescriptor"
+          }
+        },
+        "supported_ontologies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OntologyDescriptor"
+          }
+        },
+        "supported_crypto_suites": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CryptoSuite"
+          }
+        },
+        "experimental_model_attestation": {
+          "$ref": "#/$defs/ModelHomogeneityAttestation"
+        },
+        "sharing_willingness": {
+          "$ref": "#/$defs/SharingWillingness"
+        },
+        "status": {
+          "$ref": "#/$defs/FayStatus"
+        },
+        "prime_authorization": {
+          "$ref": "#/$defs/PrimeAuthorization"
+        },
+        "conformance_level": {
+          "type": "string",
+          "enum": [
+            "tp_core",
+            "tp_secure",
+            "tp_full"
+          ]
+        },
+        "json_ld_context": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "identity",
+        "capabilities",
+        "sharing_willingness",
+        "status",
+        "prime_authorization"
+      ],
+      "additionalProperties": false
+    },
+    "CognitiveFrame": {
+      "type": "object",
+      "description": "TP 1.0 Normative Layer 1: Explicit Cognitive Frame exchanged when both Fays negotiate a shared ontology.",
+      "properties": {
+        "frame_type": {
+          "type": "string",
+          "const": "explicit_cognitive_frame"
+        },
+        "frame_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ontology_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ontology_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "entities": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "context_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "frame_type",
+        "frame_id",
+        "ontology_id",
+        "ontology_version",
+        "intent_summary",
+        "confidence",
+        "assumptions",
+        "constraints",
+        "entities",
+        "context_refs"
+      ],
+      "additionalProperties": false
+    },
+    "StructuredTextFallbackFrame": {
+      "type": "object",
+      "description": "TP 1.0 Normative Layer 3: Mandatory Structured Natural-Language Fallback Frame ensuring 100% cross-implementation interoperability and Human Prime auditability when ontologies mismatch or confidence drops below threshold.",
+      "properties": {
+        "frame_type": {
+          "type": "string",
+          "const": "structured_text_fallback"
+        },
+        "frame_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "fallback_reason": {
+          "type": "string",
+          "enum": [
+            "ontology_mismatch",
+            "low_confidence",
+            "unsupported_projection",
+            "explicit_request"
+          ]
+        },
+        "language": {
+          "type": "string",
+          "minLength": 2,
+          "description": "BCP-47 language tag (e.g. zh-CN)."
+        },
+        "intent_summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structured_sections": {
+          "type": "object",
+          "properties": {
+            "intent": {
+              "type": "string",
+              "minLength": 1
+            },
+            "context": {
+              "type": "string"
+            },
+            "constraints": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "expected_outcome": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "intent",
+            "context",
+            "constraints",
+            "expected_outcome"
+          ],
+          "additionalProperties": false
+        },
+        "auditable_text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "frame_type",
+        "frame_id",
+        "fallback_reason",
+        "language",
+        "intent_summary",
+        "structured_sections",
+        "auditable_text"
+      ],
+      "additionalProperties": false
+    },
+    "ExperimentalLatentFrame": {
+      "type": "object",
+      "description": "Optional Experimental Research Track (NON-NORMATIVE in TP 1.0): Permitted ONLY when sender and receiver cryptographically prove identical base_model_digest and adapter_digest, and MUST include a human-auditable summary plus structured fallback frame.",
+      "properties": {
+        "frame_type": {
+          "type": "string",
+          "const": "experimental_latent_frame"
+        },
+        "experimental": {
+          "type": "boolean",
+          "const": true
+        },
+        "frame_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sender_model_attestation": {
+          "$ref": "#/$defs/ModelHomogeneityAttestation"
+        },
+        "receiver_model_attestation": {
+          "$ref": "#/$defs/ModelHomogeneityAttestation"
+        },
+        "vector_encoding": {
+          "type": "string",
+          "enum": [
+            "float16_base64",
+            "bfloat16_base64",
+            "int8_quantized_base64"
+          ]
+        },
+        "vector_payload_b64": {
+          "type": "string",
+          "minLength": 1
+        },
+        "audit_summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Mandatory human-auditable summary preventing opaque black-box latent exchanges."
+        },
+        "fallback_frame": {
+          "$ref": "#/$defs/StructuredTextFallbackFrame"
+        }
+      },
+      "required": [
+        "frame_type",
+        "experimental",
+        "frame_id",
+        "sender_model_attestation",
+        "receiver_model_attestation",
+        "vector_encoding",
+        "vector_payload_b64",
+        "audit_summary",
+        "fallback_frame"
+      ],
+      "additionalProperties": false
+    },
+    "CognitiveExchangeFrame": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CognitiveFrame"
+        },
+        {
+          "$ref": "#/$defs/StructuredTextFallbackFrame"
+        },
+        {
+          "$ref": "#/$defs/ExperimentalLatentFrame"
+        }
+      ]
+    },
+    "ResourcePermissions": {
+      "type": "object",
+      "description": "Per-Fay resource permissions keyed by FayID.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "read": {
+            "type": "boolean"
+          },
+          "write": {
+            "type": "boolean"
+          },
+          "time_limited": {
+            "type": "string",
+            "description": "ISO 8601 duration."
+          }
+        },
+        "required": [
+          "read",
+          "write"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "InlineContent": {
+      "type": "object",
+      "description": "Inline cognitive data strictly bounded at <= 64 KiB (65,536 bytes).",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "inline"
+        },
+        "data": {
+          "description": "Directly embedded data."
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        }
+      },
+      "required": [
+        "mode",
+        "data",
+        "size_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "ReferenceContent": {
+      "type": "object",
+      "description": "External cognitive content referenced by SSRF-guarded https:// URI (mandatory for > 64 KiB).",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "reference"
+        },
+        "uri": {
+          "type": "string",
+          "pattern": "^https://",
+          "description": "HTTPS resource URI (loopback, RFC 1918 private, link-local, CGNAT, ULA, and file:// URIs are rejected with TP-RES002)."
+        },
+        "content_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checksum": {
+          "$ref": "#/$defs/Sha256Digest"
+        }
+      },
+      "required": [
+        "mode",
+        "uri",
+        "content_type",
+        "size_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "DtpTunnelContent": {
+      "type": "object",
+      "description": "Cognitive content streamed over a bound Data Tunnel Protocol (DTP) encrypted channel.",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "const": "dtp_tunnel"
+        },
+        "tunnel_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stream_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "content_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checksum": {
+          "$ref": "#/$defs/Sha256Digest"
+        }
+      },
+      "required": [
+        "mode",
+        "tunnel_id",
+        "stream_id",
+        "content_type",
+        "size_bytes"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceAccessPolicy": {
+      "type": "object",
+      "description": "Access policy for a cognitive resource.",
+      "properties": {
+        "owner_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "private",
+            "shared",
+            "public"
+          ]
+        },
+        "requires_encryption": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "owner_fay_id",
+        "visibility",
+        "requires_encryption"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceMetadata": {
+      "type": "object",
+      "description": "Metadata for a cognitive resource.",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "created_at",
+        "updated_at",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "CognitiveResource": {
+      "type": "object",
+      "description": "A shareable cognitive resource unit.",
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource_type": {
+          "$ref": "#/$defs/CognitiveResourceType"
+        },
+        "content_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/InlineContent"
+            },
+            {
+              "$ref": "#/$defs/ReferenceContent"
+            },
+            {
+              "$ref": "#/$defs/DtpTunnelContent"
+            }
+          ]
+        },
+        "access_policy": {
+          "$ref": "#/$defs/ResourceAccessPolicy"
+        },
+        "schema_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metadata": {
+          "$ref": "#/$defs/ResourceMetadata"
+        }
+      },
+      "required": [
+        "resource_id",
+        "resource_type",
+        "content_ref",
+        "access_policy",
+        "schema_ref",
+        "metadata"
+      ],
+      "additionalProperties": false
+    },
+    "ResourceNotification": {
+      "type": "object",
+      "description": "Content-free proactive resource change notification payload (OQ-7). Carries metadata and SHA-256 digest only — never raw content.",
+      "properties": {
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource_type": {
+          "$ref": "#/$defs/CognitiveResourceType"
+        },
+        "change_kind": {
+          "type": "string",
+          "enum": [
+            "created",
+            "updated",
+            "unmounted"
+          ]
+        },
+        "content_digest": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "byte_length": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sync_version": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "actor_fay_id": {
+          "$ref": "#/$defs/FayID"
+        }
+      },
+      "required": [
+        "context_id",
+        "resource_id",
+        "resource_type",
+        "change_kind",
+        "content_digest",
+        "byte_length",
+        "sync_version",
+        "updated_at",
+        "actor_fay_id"
+      ],
+      "additionalProperties": false
+    },
+    "MountedResource": {
+      "type": "object",
+      "description": "A cognitive resource mounted into a SharedContext.",
+      "properties": {
+        "resource": {
+          "$ref": "#/$defs/CognitiveResource"
+        },
+        "mount_point": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "permissions": {
+          "$ref": "#/$defs/ResourcePermissions"
+        }
+      },
+      "required": [
+        "resource",
+        "mount_point",
+        "owner_fay_id",
+        "permissions"
+      ],
+      "additionalProperties": false
+    },
+    "AccessControlList": {
+      "type": "object",
+      "description": "Access control list for a SharedContext.",
+      "properties": {
+        "default_policy": {
+          "type": "string",
+          "enum": [
+            "deny_all",
+            "read_only",
+            "read_write"
+          ]
+        },
+        "per_resource_overrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ResourcePermissions"
+          }
+        }
+      },
+      "required": [
+        "default_policy",
+        "per_resource_overrides"
+      ],
+      "additionalProperties": false
+    },
+    "ContextLifecycle": {
+      "type": "object",
+      "description": "5-state lifecycle of a SharedContext: initializing -> active <-> syncing / suspended -> terminated.",
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "initializing",
+            "active",
+            "syncing",
+            "suspended",
+            "terminated"
+          ]
+        },
+        "termination_reason": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "expired",
+            "revoked"
+          ]
+        },
+        "creation_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiration_event": {
+          "type": "string"
+        },
+        "revocation_reason": {
+          "type": "string"
+        },
+        "last_state_change": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "state",
+        "creation_time",
+        "last_state_change"
+      ],
+      "additionalProperties": false
+    },
+    "SyncState": {
+      "type": "object",
+      "description": "Synchronization state of a SharedContext ordered by monotonic (sync_version, updated_at, actor_fay_id) for deterministic LWW convergence.",
+      "properties": {
+        "sync_version": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Monotonically increasing synchronization counter."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 UTC timestamp of latest update."
+        },
+        "actor_fay_id": {
+          "$ref": "#/$defs/FayID",
+          "description": "FayID of the participant applying the update (deterministic tie-breaker)."
+        },
+        "conflict_resolution": {
+          "type": "string",
+          "enum": [
+            "last_writer_wins",
+            "crdt",
+            "operational_transform"
+          ]
+        },
+        "pending_changes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sync_version",
+        "updated_at",
+        "actor_fay_id",
+        "conflict_resolution",
+        "pending_changes"
+      ],
+      "additionalProperties": false
+    },
+    "SharedContext": {
+      "type": "object",
+      "description": "Shared context — temporary mounting space for cognitive resources.",
+      "properties": {
+        "context_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "participants": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/FayIdentity"
+          }
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "delegated_access",
+            "collaborative_space"
+          ]
+        },
+        "mounted_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MountedResource"
+          }
+        },
+        "access_control": {
+          "$ref": "#/$defs/AccessControlList"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/ContextLifecycle"
+        },
+        "sync_state": {
+          "$ref": "#/$defs/SyncState"
+        }
+      },
+      "required": [
+        "context_id",
+        "participants",
+        "mode",
+        "mounted_resources",
+        "access_control",
+        "lifecycle",
+        "sync_state"
+      ],
+      "additionalProperties": false
+    },
+    "KeyExchangeInfo": {
+      "type": "object",
+      "description": "Key exchange metadata for hybrid payload encryption.",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "ECDH-P256",
+            "X25519"
+          ]
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Base64-encoded ephemeral sender public key."
+        },
+        "encrypted_session_key": {
+          "type": "string",
+          "description": "Base64-encoded wrapped session key or HKDF salt+nonce."
+        },
+        "iv": {
+          "type": "string",
+          "description": "Base64-encoded 12-byte AEAD initialization vector."
+        },
+        "auth_tag": {
+          "type": "string",
+          "description": "Base64-encoded 16-byte AEAD authentication tag."
+        }
+      },
+      "required": [
+        "method",
+        "public_key",
+        "encrypted_session_key"
+      ],
+      "additionalProperties": false
+    },
+    "SelectiveDisclosure": {
+      "type": "object",
+      "description": "Selective disclosure field whitelist.",
+      "properties": {
+        "disclosed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "redacted_field_digests": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Sha256Digest"
+          }
+        },
+        "policy_ref": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "disclosed_fields"
+      ],
+      "additionalProperties": false
+    },
+    "EncryptedPayload": {
+      "type": "object",
+      "description": "AEAD encrypted payload protecting Human Prime private cognitive data.",
+      "properties": {
+        "encryption_algorithm": {
+          "type": "string",
+          "enum": [
+            "AES-256-GCM",
+            "ChaCha20-Poly1305"
+          ]
+        },
+        "encrypted_data": {
+          "type": "string"
+        },
+        "key_exchange_info": {
+          "$ref": "#/$defs/KeyExchangeInfo"
+        },
+        "selective_disclosure": {
+          "$ref": "#/$defs/SelectiveDisclosure"
+        },
+        "audit_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "encryption_algorithm",
+        "encrypted_data",
+        "key_exchange_info",
+        "audit_ref"
+      ],
+      "additionalProperties": false
+    },
+    "CredentialScope": {
+      "type": "object",
+      "description": "Least-privilege resource and operation scope of a CallbackCredential.",
+      "properties": {
+        "resources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "resources",
+        "operations"
+      ],
+      "additionalProperties": false
+    },
+    "CallbackCredential": {
+      "type": "object",
+      "description": "Scoped, time-limited callback credential supporting mandatory in-band revocation (credential_revoke) and optional HTTPS revocation_endpoint.",
+      "properties": {
+        "credential_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "$ref": "#/$defs/CredentialScope"
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_reference": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "holder_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "encrypted_token": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revocation_endpoint": {
+          "type": "string",
+          "pattern": "^https://"
+        }
+      },
+      "required": [
+        "credential_id",
+        "scope",
+        "expiration",
+        "resource_reference",
+        "issuer_fay_id",
+        "encrypted_token"
+      ],
+      "additionalProperties": false
+    },
+    "CredentialRevocation": {
+      "type": "object",
+      "description": "Mandatory in-band revocation payload for MessageType = credential_revoke (OQ-12). Causes subsequent access with credential_id to deterministically fail with TP-C002.",
+      "properties": {
+        "credential_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "issuer_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "revoked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "credential_id",
+        "issuer_fay_id",
+        "revoked_at",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "AuditRecord": {
+      "type": "object",
+      "description": "Content-free local hash-chained audit record owned and deletable under Human Prime retention policy (OQ-11). Never stores raw payload data, keys, or tokens.",
+      "properties": {
+        "record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "session_established",
+            "context_created",
+            "context_synced",
+            "context_terminated",
+            "resource_mounted",
+            "resource_accessed",
+            "payload_encrypted",
+            "payload_decrypted",
+            "credential_issued",
+            "credential_used",
+            "credential_revoked",
+            "retention_compacted"
+          ]
+        },
+        "actor_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "human_prime_id": {
+          "type": "string"
+        },
+        "context_id": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "credential_id": {
+          "type": "string"
+        },
+        "payload_digest": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "prev_record_hash": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "record_hash": {
+          "$ref": "#/$defs/Sha256Digest"
+        },
+        "retention_policy_ref": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "sequence",
+        "timestamp",
+        "event_type",
+        "actor_fay_id",
+        "payload_digest",
+        "prev_record_hash",
+        "record_hash"
+      ],
+      "additionalProperties": false
+    },
+    "GoalType": {
+      "type": "string",
+      "enum": [
+        "query",
+        "execute",
+        "subscribe",
+        "notify",
+        "delegate",
+        "consult"
+      ]
+    },
+    "GoalStatus": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "negotiating",
+        "accepted",
+        "in_progress",
+        "completed",
+        "failed",
+        "cancelled",
+        "rejected"
+      ]
+    },
+    "GoalDescription": {
+      "type": "object",
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "detailed": {
+          "type": "string"
+        },
+        "output_schema": {
+          "$ref": "#/$defs/JSONSchema"
+        }
+      },
+      "required": [
+        "summary",
+        "output_schema"
+      ],
+      "additionalProperties": false
+    },
+    "TypedParameters": {
+      "type": "object",
+      "properties": {
+        "schema_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "values": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "schema_ref",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "GoalConstraint": {
+      "type": "object",
+      "properties": {
+        "constraint_type": {
+          "type": "string",
+          "enum": [
+            "deadline",
+            "priority",
+            "resource_limit",
+            "custom"
+          ]
+        },
+        "value": {},
+        "required": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "constraint_type",
+        "value",
+        "required"
+      ],
+      "additionalProperties": false
+    },
+    "SubGoalReference": {
+      "type": "object",
+      "properties": {
+        "sub_goal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "sub_goal_id",
+        "depends_on"
+      ],
+      "additionalProperties": false
+    },
+    "GoalError": {
+      "type": "object",
+      "properties": {
+        "error_code": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        },
+        "recovery_suggestions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "error_code",
+        "error_message"
+      ],
+      "additionalProperties": false
+    },
+    "GoalResult": {
+      "type": "object",
+      "properties": {
+        "goal_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "completed",
+            "failed"
+          ]
+        },
+        "output": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "error": {
+          "$ref": "#/$defs/GoalError"
+        }
+      },
+      "required": [
+        "goal_id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "Goal": {
+      "type": "object",
+      "description": "Structured collaboration goal with DAG sub-goals.",
+      "properties": {
+        "goal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal_type": {
+          "$ref": "#/$defs/GoalType"
+        },
+        "description": {
+          "$ref": "#/$defs/GoalDescription"
+        },
+        "parameters": {
+          "$ref": "#/$defs/TypedParameters"
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GoalConstraint"
+          }
+        },
+        "sub_goals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SubGoalReference"
+          }
+        },
+        "context_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cap_handoff_ref": {
+          "type": "string",
+          "description": "Optional Control Authority Protocol (CAP) evaluation request reference when the Goal triggers physical/host device control."
+        },
+        "status": {
+          "$ref": "#/$defs/GoalStatus"
+        },
+        "result": {
+          "$ref": "#/$defs/GoalResult"
+        }
+      },
+      "required": [
+        "goal_id",
+        "goal_type",
+        "description",
+        "parameters",
+        "constraints",
+        "sub_goals",
+        "context_ref",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "PrimeDelegation": {
+      "type": "object",
+      "description": "Human Prime delegation proof bound to a Faying Protocol mandate.",
+      "properties": {
+        "human_prime_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "delegated_permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fp_authorization_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "human_prime_id",
+        "delegated_permissions",
+        "fp_authorization_ref"
+      ],
+      "additionalProperties": false
+    },
+    "AuthorizationScope": {
+      "type": "object",
+      "properties": {
+        "required_permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prime_delegation": {
+          "$ref": "#/$defs/PrimeDelegation"
+        }
+      },
+      "required": [
+        "required_permissions"
+      ],
+      "additionalProperties": false
+    },
+    "RetryPolicy": {
+      "type": "object",
+      "properties": {
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "backoff_strategy": {
+          "type": "string",
+          "enum": [
+            "fixed",
+            "exponential"
+          ]
+        },
+        "initial_delay_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "max_retries",
+        "backoff_strategy",
+        "initial_delay_ms"
+      ],
+      "additionalProperties": false
+    },
+    "CallbackConfig": {
+      "type": "object",
+      "properties": {
+        "callback_url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "callback_credential": {
+          "$ref": "#/$defs/CallbackCredential"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retry_policy": {
+          "$ref": "#/$defs/RetryPolicy"
+        }
+      },
+      "required": [
+        "timeout_ms"
+      ],
+      "additionalProperties": false
+    },
+    "ConsultationRequest": {
+      "type": "object",
+      "properties": {
+        "consultation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "query_type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_info_schema": {
+          "$ref": "#/$defs/JSONSchema"
+        },
+        "authorization_scope": {
+          "$ref": "#/$defs/AuthorizationScope"
+        },
+        "callback_config": {
+          "$ref": "#/$defs/CallbackConfig"
+        },
+        "chained_from": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "consultation_id",
+        "query_type",
+        "required_info_schema",
+        "authorization_scope"
+      ],
+      "additionalProperties": false
+    },
+    "ConsultationResponse": {
+      "type": "object",
+      "properties": {
+        "consultation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "fulfilled",
+            "partial",
+            "rejected"
+          ]
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "encrypted_payload": {
+          "$ref": "#/$defs/EncryptedPayload"
+        },
+        "rejection_reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "consultation_id",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "CommunicationTier": {
+      "type": "string",
+      "description": "Communication tier negotiated in ProtocolContract. tier_1_native_tp and tier_3_structured_text_fallback form the TP 1.0 Normative Core; tier_2_ai_generated is disabled by default and experimental per OQ-9.",
+      "enum": [
+        "tier_1_native_tp",
+        "tier_2_ai_generated",
+        "tier_3_structured_text_fallback"
+      ]
+    },
+    "TransportMethod": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "native_tp",
+            "dtp_tunnel",
+            "a2a_jsonrpc",
+            "mcp_tool_call",
+            "rest_api",
+            "prompt_embedding"
+          ]
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "tunnel_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "protocol"
+      ],
+      "additionalProperties": false
+    },
+    "NegotiationStep": {
+      "type": "object",
+      "properties": {
+        "step": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "initiator_fay_id": {
+          "$ref": "#/$defs/FayID"
+        },
+        "proposed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TransportMethod"
+          }
+        },
+        "selected": {
+          "$ref": "#/$defs/TransportMethod"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "step",
+        "initiator_fay_id",
+        "proposed",
+        "timestamp"
+      ],
+      "additionalProperties": false
+    },
+    "ProtocolContract": {
+      "type": "object",
+      "description": "Agreed protocol contract binding transport, crypto_suite, ontology/codebook or mandatory structured text fallback.",
+      "properties": {
+        "contract_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tp_version": {
+          "$ref": "#/$defs/ProtocolVersion"
+        },
+        "crypto_suite": {
+          "$ref": "#/$defs/CryptoSuite"
+        },
+        "transport_method": {
+          "$ref": "#/$defs/TransportMethod"
+        },
+        "communication_tier": {
+          "$ref": "#/$defs/CommunicationTier"
+        },
+        "shared_ontology": {
+          "$ref": "#/$defs/OntologyDescriptor"
+        },
+        "fallback_active": {
+          "type": "boolean"
+        },
+        "experimental_latent_enabled": {
+          "type": "boolean"
+        },
+        "security_level": {
+          "type": "string",
+          "enum": [
+            "basic",
+            "standard",
+            "high"
+          ]
+        },
+        "contract_expiration": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "negotiation_trace": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NegotiationStep"
+          }
+        }
+      },
+      "required": [
+        "contract_id",
+        "tp_version",
+        "crypto_suite",
+        "transport_method",
+        "communication_tier",
+        "fallback_active",
+        "security_level",
+        "contract_expiration",
+        "negotiation_trace"
+      ],
+      "additionalProperties": false
+    },
+    "LossMetadata": {
+      "type": "object",
+      "description": "Explicit semantic degradation record attached when translating across protocol boundaries (OQ-10).",
+      "properties": {
+        "source_protocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_protocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dropped_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "degraded_semantics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attribution_preserved": {
+          "type": "boolean"
+        },
+        "reversible": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "source_protocol",
+        "target_protocol",
+        "dropped_fields",
+        "degraded_semantics",
+        "attribution_preserved",
+        "reversible"
+      ],
+      "additionalProperties": false
+    },
+    "TraceInfo": {
+      "type": "object",
+      "description": "Cross-protocol tracing and semantic loss metadata.",
+      "properties": {
+        "original_protocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_message_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "hop_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "loss_metadata": {
+          "$ref": "#/$defs/LossMetadata"
+        }
+      },
+      "required": [
+        "original_protocol",
+        "original_message_id",
+        "hop_count"
+      ],
+      "additionalProperties": false
+    },
+    "MessageType": {
+      "type": "string",
+      "description": "Enumeration of all valid TP 1.0 message types.",
+      "enum": [
+        "identity_proof",
+        "profile_exchange",
+        "context_create",
+        "context_update",
+        "context_sync",
+        "context_revoke",
+        "resource_mount",
+        "resource_unmount",
+        "resource_notify",
+        "cognitive_frame",
+        "credential_revoke",
+        "goal_propose",
+        "goal_negotiate",
+        "goal_accept",
+        "goal_reject",
+        "goal_result",
+        "consultation_request",
+        "consultation_response",
+        "negotiate_request",
+        "negotiate_response",
+        "session_ready",
+        "error"
+      ]
+    },
+    "MessageEnvelope": {
+      "type": "object",
+      "description": "Transport-agnostic TP/1.0 wire envelope signed via RFC 8785 JCS + Ed25519.",
+      "properties": {
+        "tp_version": {
+          "$ref": "#/$defs/ProtocolVersion"
+        },
+        "message_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sender": {
+          "$ref": "#/$defs/FayIdentity"
+        },
+        "receiver": {
+          "$ref": "#/$defs/FayIdentity"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "message_type": {
+          "$ref": "#/$defs/MessageType"
+        },
+        "payload": {
+          "description": "Message payload determined by message_type."
+        },
+        "correlation_id": {
+          "type": "string"
+        },
+        "crypto_suite": {
+          "$ref": "#/$defs/CryptoSuite"
+        },
+        "signature": {
+          "type": "string",
+          "description": "Base64-encoded signature over RFC 8785 JCS canonicalized envelope excluding the signature field."
+        },
+        "protocol_contract_ref": {
+          "type": "string"
+        },
+        "icp_annotations": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Optional lossless iFay Context Protocol (.ctx) structured annotations."
+        },
+        "trace_info": {
+          "$ref": "#/$defs/TraceInfo"
+        }
+      },
+      "required": [
+        "tp_version",
+        "message_id",
+        "sender",
+        "receiver",
+        "timestamp",
+        "message_type",
+        "payload"
+      ],
+      "additionalProperties": false
+    },
+    "TPError": {
+      "type": "object",
+      "description": "Structured error response with deterministic category-prefixed error codes.",
+      "properties": {
+        "error_code": {
+          "type": "string",
+          "pattern": "^TP-[A-Z]+[0-9]{3}$"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "recovery_suggestions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "correlation_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "error_code",
+        "message"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$ref": "#/$defs/MessageEnvelope"
+}

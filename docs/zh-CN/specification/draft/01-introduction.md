@@ -79,18 +79,20 @@ TP 在协议消息中**引用**这些姊妹协议的产物（如 FP 授权引用
 
 | 类型 | 规范 | 示例 |
 |------|------|------|
-| Fay ID | 全局唯一字符串，URI 安全字符集 | `fay:medical-clinic-shanghai-007` |
+| Fay ID | 分类前缀 `ifay_`（自然人分身）或 `cofay_`（组织/公共服务分身）+ 小写 RFC 4648 Base32（16–64 位） | `ifay_alice234567abcdef`、`cofay_bobservice234567ab` |
 | 消息 ID | UUID v7（时序可排序） | `01902c4f-1a2b-7000-8000-000000000001` |
 | 关联 ID | UUID v4 或 v7 | 同上 |
 | 时间戳 | ISO 8601，UTC，毫秒精度 | `2026-05-27T08:30:00.000Z` |
 | 持续时间 | ISO 8601 duration | `PT15M`（15 分钟） |
-| 字段名 | `snake_case` | `prime_authorization`、`mounted_resources` |
+| 字段名 | `snake_case`（自然人授权主体统一使用 `human_prime_id` / `prime_authorization` / `prime_delegation`；`宿主` / `Host` 仅指终端硬件设备或客户端软件应用） | `prime_authorization`、`mounted_resources` |
 
-### 1.5.4 版本标注
+### 1.5.4 版本标注与科学诚实边界
 
-- **协议版本**（`tp_version`）：遵循语义化版本 SemVer 2.0.0。
-- **规范文档版本**：以发布日期标识（`YYYY-MM-DD`），与 `schema/{date}/` 同步。
-- **`draft`** 状态的规范允许不兼容变更；正式版本目录（如 `2025-10-25/`）一经发布即冻结。
+- **线格式协议版本**（`tp_version`）：统一采用两段式 `MAJOR.MINOR`（协议标识 `TP/1.0`，信封字段规范值为 `"1.0"`，解析器兼容归一化 `"TP/1.0"`）。任何三段式 SemVer 字符串（如 `"1.0.0"` 或 `"TP/1.0.0"`）均属非法线格式，接收方 **MUST** 以 `TP-VER003` 拒绝；跨主版本不兼容（`MAJOR != 1`）**MUST** 以 `TP-VER001` 拒绝。注：`CapabilityDescriptor.version` 描述单个能力自身的工程迭代，仍可使用语义化版本字符串。
+- **规范文档与 Schema 快照版本**：以发布日期标识（`YYYY-MM-DD`），与 `schema/2025-10-25/` 及权威规范 Schema `schemas/tp-1.0.json` 同步。`docs/zh-CN/` 为唯一权威源语言。
+- **TP 1.0 规范核心与长期研究轨道边界**：
+  - **TP 1.0 Normative Core（标准互操作必选核心）**：由（1）显式认知帧 Schema（`CognitiveFrame`）、（2）共享本体与码本版本协商（`OntologyDescriptor`）、（3）强制结构化自然语言回退信道（`StructuredTextFallbackFrame`）三层可验证认知交换栈构成；当双方无共同本体或置信度低于阈值时 **MUST** 无缝回退至可人类审计的结构化文本帧。
+  - **Experimental Latent Research Track（可选长期研究轨道）**：TP 1.0 **绝不宣称**跨独立训练异构基座模型的无损原生隐向量直传已获解决。`ExperimentalLatentFrame` 仅在双方通过密码学摘要证明完全同构的 `base_model_digest` 与 `adapter_digest`、且同时附带非空人类可审计摘要（`audit_summary`）与结构化回退帧（`fallback_frame`）时方可在实验轨道启用；异构模型隐向量帧 **MUST** 以 `TP-LAT002` 拒绝。
 
 ## 1.6 与蓝图的关系
 

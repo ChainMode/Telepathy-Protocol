@@ -192,7 +192,7 @@ POST /tp/v1/consultation/{id}/response → consultation_response
 POST /tp/v1/goal/propose HTTP/1.1
 Host: hospital-east.gov.cn
 Content-Type: application/tp+json
-TP-Version: 1.0.0
+TP-Version: 1.0
 TP-Contract-Ref: <contract_id>
 
 { /* MessageEnvelope */ }
@@ -232,7 +232,7 @@ TP 消息以 fenced code block 包裹，前后附自然语言上下文：
 
 ```tp-envelope
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "...",
   /* 完整 MessageEnvelope */
 }

@@ -1,0 +1,955 @@
+{
+  "suite": "Telepathy Protocol 1.0 Conformance Test Vectors",
+  "protocol": "TP/1.0",
+  "tp_version": "1.0",
+  "schema_ref": "https://ifay.ai/schemas/tp-1.0.json",
+  "edition": "2025-10-25",
+  "vectors": [
+    {
+      "id": "TP-VEC-001",
+      "title": "Valid TP/1.0 JCS + Ed25519 signed MessageEnvelope verification",
+      "category": "envelope_signature",
+      "input": {
+        "seed_hex": "0101010101010101010101010101010101010101010101010101010101010101",
+        "sign_dynamically": true,
+        "envelope": {
+          "tp_version": "1.0",
+          "message_id": "01933b4a-7c10-7000-8000-000000000101",
+          "sender": {
+            "fay_id": "ifay_alice234567abcdef",
+            "fay_type": "iFay",
+            "human_prime_id": "prime_alice_001",
+            "fp_authorization_ref": "fp_mandate_alice_2026_01",
+            "did": {
+              "method": "did:key",
+              "value": "did:key:z6MkAliceVector001",
+              "proof": {
+                "type": "Ed25519Signature2020",
+                "created": "2026-11-16T00:00:00Z",
+                "verification_method": "did:key:z6MkAliceVector001#key-1",
+                "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDE="
+              }
+            }
+          },
+          "receiver": {
+            "fay_id": "cofay_bobservice234567ab",
+            "fay_type": "coFay",
+            "fp_authorization_ref": "fp_mandate_bob_org_2026_01",
+            "did": {
+              "method": "did:web",
+              "value": "did:web:travel.example.org",
+              "proof": {
+                "type": "Ed25519Signature2020",
+                "created": "2026-11-16T00:00:00Z",
+                "verification_method": "did:web:travel.example.org#key-1",
+                "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDI="
+              }
+            }
+          },
+          "timestamp": "2026-11-16T00:00:00Z",
+          "message_type": "negotiate_request",
+          "payload": {
+            "supported_versions": ["1.0"],
+            "transports": [{ "protocol": "native_tp" }]
+          }
+        }
+      },
+      "expected": {
+        "ok": true
+      }
+    },
+    {
+      "id": "TP-VEC-002",
+      "title": "Three-segment SemVer wire version 1.0.0 rejected with TP-VER003",
+      "category": "version_validation",
+      "input": {
+        "tp_version": "1.0.0"
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-VER003"
+      }
+    },
+    {
+      "id": "TP-VEC-003",
+      "title": "Unsupported major wire version 2.0 rejected with TP-VER001",
+      "category": "version_validation",
+      "input": {
+        "tp_version": "2.0"
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-VER001"
+      }
+    },
+    {
+      "id": "TP-VEC-004",
+      "title": "iFay identity missing mandatory human_prime_id rejected with TP-ID002",
+      "category": "identity_validation",
+      "input": {
+        "identity": {
+          "fay_id": "ifay_alice234567abcdef",
+          "fay_type": "iFay",
+          "did": {
+            "method": "did:key",
+            "value": "did:key:z6MkAliceMissingPrime",
+            "proof": {
+              "type": "Ed25519Signature2020",
+              "created": "2026-11-16T00:00:00Z",
+              "verification_method": "did:key:z6MkAliceMissingPrime#key-1",
+              "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDQ="
+            }
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-ID002"
+      }
+    },
+    {
+      "id": "TP-VEC-005",
+      "title": "Complete 5-step session establishment reaches ready state",
+      "category": "session_establishment",
+      "input": {
+        "steps": [
+          {
+            "op": "negotiate",
+            "t": 100,
+            "initiator_offer": {
+              "fay_id": "ifay_alice234567abcdef",
+              "tp_version": "1.0",
+              "crypto_suites": ["Ed25519"],
+              "transports": [{ "protocol": "native_tp" }],
+              "supported_ontologies": [
+                {
+                  "ontology_id": "onto.ifay.travel.v1",
+                  "version": "1.0",
+                  "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+                }
+              ]
+            },
+            "responder_offer": {
+              "fay_id": "cofay_bobservice234567ab",
+              "tp_version": "1.0",
+              "crypto_suites": ["Ed25519"],
+              "transports": [{ "protocol": "native_tp" }],
+              "supported_ontologies": [
+                {
+                  "ontology_id": "onto.ifay.travel.v1",
+                  "version": "1.0",
+                  "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+                }
+              ]
+            }
+          },
+          {
+            "op": "verify_identities",
+            "t": 200,
+            "initiator": {
+              "fay_id": "ifay_alice234567abcdef",
+              "fay_type": "iFay",
+              "human_prime_id": "prime_alice_001",
+              "fp_authorization_ref": "fp_mandate_alice_2026_01",
+              "did": {
+                "method": "did:key",
+                "value": "did:key:z6MkAliceVector005",
+                "proof": {
+                  "type": "Ed25519Signature2020",
+                  "created": "2026-11-16T00:00:00Z",
+                  "verification_method": "did:key:z6MkAliceVector005#key-1",
+                  "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDU="
+                }
+              }
+            },
+            "responder": {
+              "fay_id": "cofay_bobservice234567ab",
+              "fay_type": "coFay",
+              "fp_authorization_ref": "fp_mandate_bob_org_2026_01",
+              "did": {
+                "method": "did:web",
+                "value": "did:web:travel.example.org",
+                "proof": {
+                  "type": "Ed25519Signature2020",
+                  "created": "2026-11-16T00:00:00Z",
+                  "verification_method": "did:web:travel.example.org#key-1",
+                  "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDY="
+                }
+              }
+            }
+          },
+          {
+            "op": "exchange_profiles",
+            "t": 300,
+            "initiator_profile": {
+              "identity": {
+                "fay_id": "ifay_alice234567abcdef",
+                "fay_type": "iFay",
+                "human_prime_id": "prime_alice_001",
+                "fp_authorization_ref": "fp_mandate_alice_2026_01",
+                "did": {
+                  "method": "did:key",
+                  "value": "did:key:z6MkAliceVector005",
+                  "proof": {
+                    "type": "Ed25519Signature2020",
+                    "created": "2026-11-16T00:00:00Z",
+                    "verification_method": "did:key:z6MkAliceVector005#key-1",
+                    "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDU="
+                  }
+                }
+              },
+              "capabilities": [],
+              "sharing_willingness": {
+                "shareable_resource_types": ["memory_fragment"],
+                "preferred_mode": "collaborative_space",
+                "max_concurrent_contexts": 2
+              },
+              "status": {
+                "availability": "online",
+                "current_contexts": 0,
+                "last_active": "2026-11-16T00:00:00Z"
+              },
+              "prime_authorization": {
+                "fp_authorization_ref": "fp_mandate_alice_2026_01",
+                "authorized_resource_types": ["memory_fragment"],
+                "authorized_operations": ["read", "write"],
+                "max_sharing_duration": "PT1H",
+                "restrictions": []
+              }
+            },
+            "responder_profile": {
+              "identity": {
+                "fay_id": "cofay_bobservice234567ab",
+                "fay_type": "coFay",
+                "fp_authorization_ref": "fp_mandate_bob_org_2026_01",
+                "did": {
+                  "method": "did:web",
+                  "value": "did:web:travel.example.org",
+                  "proof": {
+                    "type": "Ed25519Signature2020",
+                    "created": "2026-11-16T00:00:00Z",
+                    "verification_method": "did:web:travel.example.org#key-1",
+                    "proof_value": "c2ludGhldGljLWRpZC1wcm9vZi0wMDY="
+                  }
+                }
+              },
+              "capabilities": [],
+              "sharing_willingness": {
+                "shareable_resource_types": ["memory_fragment"],
+                "preferred_mode": "collaborative_space",
+                "max_concurrent_contexts": 8
+              },
+              "status": {
+                "availability": "online",
+                "current_contexts": 1,
+                "last_active": "2026-11-16T00:00:00Z"
+              },
+              "prime_authorization": {
+                "fp_authorization_ref": "fp_mandate_bob_org_2026_01",
+                "authorized_resource_types": ["memory_fragment"],
+                "authorized_operations": ["read", "write"],
+                "max_sharing_duration": "PT4H",
+                "restrictions": []
+              }
+            }
+          },
+          {
+            "op": "establish_context",
+            "t": 400,
+            "context": {
+              "context_id": "ctx_vec_005",
+              "state": "active"
+            }
+          },
+          {
+            "op": "ready",
+            "t": 500
+          }
+        ]
+      },
+      "expected": {
+        "ok": true
+      }
+    },
+    {
+      "id": "TP-VEC-006",
+      "title": "Out-of-order session step (context before identity proof) rejected with TP-SES001",
+      "category": "session_establishment",
+      "input": {
+        "steps": [
+          {
+            "op": "establish_context",
+            "t": 100,
+            "context": {
+              "context_id": "ctx_premature",
+              "state": "active"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-SES001"
+      }
+    },
+    {
+      "id": "TP-VEC-007",
+      "title": "Shared ontology match negotiates tier_1_native_tp and accepts explicit_cognitive_frame",
+      "category": "cognitive_exchange",
+      "input": {
+        "initiator_offer": {
+          "fay_id": "ifay_alice234567abcdef",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ]
+        },
+        "responder_offer": {
+          "fay_id": "cofay_bobservice234567ab",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ]
+        },
+        "frame": {
+          "frame_type": "explicit_cognitive_frame",
+          "frame_id": "cf_vec_007",
+          "ontology_id": "onto.ifay.travel.v1",
+          "ontology_version": "1.0",
+          "intent_summary": "Book quiet-car rail seat from Tokyo to Kyoto",
+          "confidence": 0.94,
+          "assumptions": ["morning departure"],
+          "constraints": ["non_smoking"],
+          "entities": { "origin": "Tokyo", "destination": "Kyoto" },
+          "context_refs": ["ctx_vec_005"]
+        }
+      },
+      "expected": {
+        "ok": true,
+        "communication_tier": "tier_1_native_tp",
+        "fallback_active": false
+      }
+    },
+    {
+      "id": "TP-VEC-008",
+      "title": "Ontology mismatch enforces mandatory tier_3_structured_text_fallback and auditable text frame",
+      "category": "cognitive_exchange",
+      "input": {
+        "initiator_offer": {
+          "fay_id": "ifay_alice234567abcdef",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ]
+        },
+        "responder_offer": {
+          "fay_id": "cofay_bobservice234567ab",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.logistics.v2",
+              "version": "2.0",
+              "codebook_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999"
+            }
+          ]
+        },
+        "frame": {
+          "frame_type": "structured_text_fallback",
+          "frame_id": "fb_vec_008",
+          "fallback_reason": "ontology_mismatch",
+          "language": "zh-CN",
+          "intent_summary": "查询东京至京都静音车厢余票",
+          "structured_sections": {
+            "intent": "查询东京至京都上午高铁静音车厢座位",
+            "context": "双方无共同领域本体，自动降级至可人类审计结构化自然语言回退信道",
+            "constraints": ["无烟车厢", "靠窗优先"],
+            "expected_outcome": "可选车次与票价列表"
+          },
+          "auditable_text": "[TP/1.0 Fallback] 意图：查询东京至京都上午高铁静音车厢座位；约束：无烟车厢、靠窗优先。"
+        }
+      },
+      "expected": {
+        "ok": true,
+        "communication_tier": "tier_3_structured_text_fallback",
+        "fallback_active": true
+      }
+    },
+    {
+      "id": "TP-VEC-009",
+      "title": "Heterogeneous model raw latent vector frame rejected with TP-LAT002 (Scientific Honesty boundary)",
+      "category": "cognitive_exchange",
+      "input": {
+        "initiator_offer": {
+          "fay_id": "ifay_alice234567abcdef",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "responder_offer": {
+          "fay_id": "cofay_bobservice234567ab",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "frame": {
+          "frame_type": "experimental_latent_frame",
+          "experimental": true,
+          "frame_id": "lat_vec_009",
+          "sender_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "receiver_model_attestation": {
+            "base_model_id": "different-model-34b-v2",
+            "base_model_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+            "adapter_digest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+            "projection_version": "1.0",
+            "dimension": 1024
+          },
+          "vector_encoding": "float16_base64",
+          "vector_payload_b64": "AAECAwQFBgcICQoLDA0ODw==",
+          "audit_summary": "Cross-model raw vector attempt",
+          "fallback_frame": {
+            "frame_type": "structured_text_fallback",
+            "frame_id": "fb_vec_009",
+            "fallback_reason": "unsupported_projection",
+            "language": "zh-CN",
+            "intent_summary": "回退摘要",
+            "structured_sections": {
+              "intent": "查询行程",
+              "context": "实验轨道回退",
+              "constraints": [],
+              "expected_outcome": "行程草案"
+            },
+            "auditable_text": "查询行程草案"
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-LAT002"
+      }
+    },
+    {
+      "id": "TP-VEC-010",
+      "title": "Homogeneous model digest match + mandatory audit_summary experimental latent frame accepted",
+      "category": "cognitive_exchange",
+      "input": {
+        "initiator_offer": {
+          "fay_id": "ifay_alice234567abcdef",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "responder_offer": {
+          "fay_id": "cofay_bobservice234567ab",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "supported_ontologies": [
+            {
+              "ontology_id": "onto.ifay.travel.v1",
+              "version": "1.0",
+              "codebook_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "frame": {
+          "frame_type": "experimental_latent_frame",
+          "experimental": true,
+          "frame_id": "lat_vec_010",
+          "sender_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "receiver_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "vector_encoding": "float16_base64",
+          "vector_payload_b64": "AAECAwQFBgcICQoLDA0ODw==",
+          "audit_summary": "同构模型 fay-ego-7b-v1 行程偏好紧凑向量（京都三日静音高铁与素食餐饮偏好）",
+          "fallback_frame": {
+            "frame_type": "structured_text_fallback",
+            "frame_id": "fb_vec_010",
+            "fallback_reason": "explicit_request",
+            "language": "zh-CN",
+            "intent_summary": "京都三日静音高铁与素食餐饮偏好",
+            "structured_sections": {
+              "intent": "同步京都三日旅行偏好",
+              "context": "同构模型实验轨道附带结构化回退帧",
+              "constraints": ["素食餐饮", "静音车厢"],
+              "expected_outcome": "匹配偏好的行程推荐"
+            },
+            "auditable_text": "同步京都三日旅行偏好：素食餐饮、静音车厢。"
+          }
+        }
+      },
+      "expected": {
+        "ok": true
+      }
+    },
+    {
+      "id": "TP-VEC-011",
+      "title": "Homogeneous experimental latent frame missing audit_summary rejected with TP-LAT003",
+      "category": "cognitive_exchange",
+      "input": {
+        "initiator_offer": {
+          "fay_id": "ifay_alice234567abcdef",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "responder_offer": {
+          "fay_id": "cofay_bobservice234567ab",
+          "tp_version": "1.0",
+          "crypto_suites": ["Ed25519"],
+          "transports": [{ "protocol": "native_tp" }],
+          "experimental_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "allowExperimentalLatent": true
+        },
+        "frame": {
+          "frame_type": "experimental_latent_frame",
+          "experimental": true,
+          "frame_id": "lat_vec_011",
+          "sender_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "receiver_model_attestation": {
+            "base_model_id": "fay-ego-7b-v1",
+            "base_model_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "adapter_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "projection_version": "1.0",
+            "dimension": 256
+          },
+          "vector_encoding": "float16_base64",
+          "vector_payload_b64": "AAECAwQFBgcICQoLDA0ODw==",
+          "audit_summary": "   "
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-LAT003"
+      }
+    },
+    {
+      "id": "TP-VEC-012",
+      "title": "SharedContext collaborative_space LWW deterministic convergence on (sync_version, updated_at, actor_fay_id)",
+      "category": "lww_convergence",
+      "input": {
+        "replica_a_order": [
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Nozomi-12" },
+            "sync_version": 7,
+            "updated_at": "2026-11-16T00:15:00Z",
+            "actor_fay_id": "cofay_bobservice234567ab"
+          },
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Hikari-504" },
+            "sync_version": 7,
+            "updated_at": "2026-11-16T00:15:00Z",
+            "actor_fay_id": "ifay_alice234567abcdef"
+          },
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Kodama-700" },
+            "sync_version": 6,
+            "updated_at": "2026-11-16T00:25:00Z",
+            "actor_fay_id": "ifay_zoe234567abcdefghi"
+          }
+        ],
+        "replica_b_order": [
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Kodama-700" },
+            "sync_version": 6,
+            "updated_at": "2026-11-16T00:25:00Z",
+            "actor_fay_id": "ifay_zoe234567abcdefghi"
+          },
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Hikari-504" },
+            "sync_version": 7,
+            "updated_at": "2026-11-16T00:15:00Z",
+            "actor_fay_id": "ifay_alice234567abcdef"
+          },
+          {
+            "resource_id": "res_route",
+            "value": { "train": "Nozomi-12" },
+            "sync_version": 7,
+            "updated_at": "2026-11-16T00:15:00Z",
+            "actor_fay_id": "cofay_bobservice234567ab"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true,
+        "resource_id": "res_route",
+        "winning_actor_fay_id": "ifay_alice234567abcdef",
+        "winning_value": { "train": "Hikari-504" }
+      }
+    },
+    {
+      "id": "TP-VEC-013",
+      "title": "Expired CallbackCredential rejected with TP-C001",
+      "category": "credential_access",
+      "input": {
+        "credential": {
+          "credential_id": "cred_vec_013",
+          "scope": {
+            "resources": ["res_calendar"],
+            "operations": ["read"]
+          },
+          "expiration": "2026-11-16T01:00:00Z",
+          "resource_reference": "tp://ctx_01/res_calendar",
+          "issuer_fay_id": "ifay_alice234567abcdef",
+          "encrypted_token": "opaque_ciphertext_013"
+        },
+        "access_request": {
+          "resource": "res_calendar",
+          "operation": "read",
+          "at": "2026-11-16T01:00:05Z"
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-C001"
+      }
+    },
+    {
+      "id": "TP-VEC-014",
+      "title": "In-band credential_revoke deterministically blocks revoked CallbackCredential with TP-C002",
+      "category": "credential_access",
+      "input": {
+        "credential": {
+          "credential_id": "cred_vec_014",
+          "scope": {
+            "resources": ["res_calendar"],
+            "operations": ["read"]
+          },
+          "expiration": "2026-11-16T02:00:00Z",
+          "resource_reference": "tp://ctx_01/res_calendar",
+          "issuer_fay_id": "ifay_alice234567abcdef",
+          "encrypted_token": "opaque_ciphertext_014"
+        },
+        "revoke_message": {
+          "credential_id": "cred_vec_014",
+          "issuer_fay_id": "ifay_alice234567abcdef",
+          "revoked_at": "2026-11-16T00:30:00Z",
+          "reason": "Human Prime ended consultation"
+        },
+        "access_request": {
+          "resource": "res_calendar",
+          "operation": "read",
+          "at": "2026-11-16T00:45:00Z"
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-C002"
+      }
+    },
+    {
+      "id": "TP-VEC-015",
+      "title": "CallbackCredential out-of-scope write operation rejected with TP-C003",
+      "category": "credential_access",
+      "input": {
+        "credential": {
+          "credential_id": "cred_vec_015",
+          "scope": {
+            "resources": ["res_calendar"],
+            "operations": ["read"]
+          },
+          "expiration": "2026-11-16T02:00:00Z",
+          "resource_reference": "tp://ctx_01/res_calendar",
+          "issuer_fay_id": "ifay_alice234567abcdef",
+          "encrypted_token": "opaque_ciphertext_015"
+        },
+        "access_request": {
+          "resource": "res_calendar",
+          "operation": "write",
+          "at": "2026-11-16T00:20:00Z"
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-C003"
+      }
+    },
+    {
+      "id": "TP-VEC-016",
+      "title": "Inline CognitiveResource exceeding 64 KiB rejected with TP-RES003",
+      "category": "resource_validation",
+      "input": {
+        "resource": {
+          "resource_id": "res_vec_016",
+          "resource_type": "memory_fragment",
+          "content_ref": {
+            "mode": "inline",
+            "data": { "oversized": true },
+            "size_bytes": 70000
+          },
+          "access_policy": {
+            "owner_fay_id": "ifay_alice234567abcdef",
+            "visibility": "shared",
+            "requires_encryption": false
+          },
+          "schema_ref": "https://ifay.ai/schemas/mem.json",
+          "metadata": {
+            "created_at": "2026-11-16T00:00:00Z",
+            "updated_at": "2026-11-16T00:00:00Z",
+            "version": 1
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-RES003"
+      }
+    },
+    {
+      "id": "TP-VEC-017",
+      "title": "CognitiveResource reference URI targeting private IPv4 SSRF rejected with TP-RES002",
+      "category": "resource_validation",
+      "input": {
+        "resource": {
+          "resource_id": "res_vec_017",
+          "resource_type": "environment_context",
+          "content_ref": {
+            "mode": "reference",
+            "uri": "https://192.168.1.50/internal/config.json",
+            "content_type": "application/json",
+            "size_bytes": 1024
+          },
+          "access_policy": {
+            "owner_fay_id": "ifay_alice234567abcdef",
+            "visibility": "shared",
+            "requires_encryption": false
+          },
+          "schema_ref": "https://ifay.ai/schemas/env.json",
+          "metadata": {
+            "created_at": "2026-11-16T00:00:00Z",
+            "updated_at": "2026-11-16T00:00:00Z",
+            "version": 1
+          }
+        }
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-RES002"
+      }
+    },
+    {
+      "id": "TP-VEC-018",
+      "title": "Valid Goal acyclic sub-goal DAG and authorized consult chain accepted",
+      "category": "goal_dag_and_consult",
+      "input": {
+        "sub_goals": [
+          { "sub_goal_id": "sg_1", "depends_on": [] },
+          { "sub_goal_id": "sg_2", "depends_on": ["sg_1"] },
+          { "sub_goal_id": "sg_3", "depends_on": ["sg_1", "sg_2"] }
+        ],
+        "consultations": [
+          {
+            "consultation_id": "cons_vec_1",
+            "query_type": "schedule_window",
+            "required_info_schema": { "type": "object" },
+            "authorization_scope": {
+              "required_permissions": ["prime_delegated:schedule.read"],
+              "prime_delegation": {
+                "human_prime_id": "prime_alice_001",
+                "delegated_permissions": ["prime_delegated:schedule.read"],
+                "fp_authorization_ref": "fp_mandate_alice_2026_01"
+              }
+            }
+          },
+          {
+            "consultation_id": "cons_vec_2",
+            "query_type": "rail_seat_quote",
+            "required_info_schema": { "type": "object" },
+            "authorization_scope": {
+              "required_permissions": ["public"]
+            },
+            "chained_from": "cons_vec_1"
+          }
+        ]
+      },
+      "expected": {
+        "ok": true
+      }
+    },
+    {
+      "id": "TP-VEC-019",
+      "title": "Cyclic Goal sub-goal dependency rejected with TP-GOAL002",
+      "category": "goal_dag_and_consult",
+      "input": {
+        "sub_goals": [
+          { "sub_goal_id": "sg_alpha", "depends_on": ["sg_beta"] },
+          { "sub_goal_id": "sg_beta", "depends_on": ["sg_alpha"] }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-GOAL002"
+      }
+    },
+    {
+      "id": "TP-VEC-020",
+      "title": "AuditRecord hash chain preserves integrity with zero raw payload leakage",
+      "category": "audit_zero_payload_leak",
+      "input": {
+        "forbidden_substring": "NEVER_LEAK_PLAINTEXT_MEMORY_99",
+        "entries": [
+          {
+            "record_id": "aud_vec_01",
+            "timestamp": "2026-11-16T00:00:00Z",
+            "event_type": "context_created",
+            "actor_fay_id": "ifay_alice234567abcdef",
+            "human_prime_id": "prime_alice_001",
+            "context_id": "ctx_vec_005",
+            "payloadForDigestOnly": {
+              "private_note": "NEVER_LEAK_PLAINTEXT_MEMORY_99"
+            }
+          },
+          {
+            "record_id": "aud_vec_02",
+            "timestamp": "2026-11-16T00:05:00Z",
+            "event_type": "resource_mounted",
+            "actor_fay_id": "ifay_alice234567abcdef",
+            "human_prime_id": "prime_alice_001",
+            "context_id": "ctx_vec_005",
+            "resource_id": "res_01",
+            "payloadForDigestOnly": {
+              "private_note": "NEVER_LEAK_PLAINTEXT_MEMORY_99"
+            }
+          }
+        ]
+      },
+      "expected": {
+        "ok": true
+      }
+    },
+    {
+      "id": "TP-VEC-021",
+      "title": "AuditRecord raw payload/secret injection rejected with TP-AUD001",
+      "category": "audit_zero_payload_leak",
+      "input": {
+        "entries": [
+          {
+            "record_id": "aud_vec_bad",
+            "timestamp": "2026-11-16T00:06:00Z",
+            "event_type": "payload_encrypted",
+            "actor_fay_id": "ifay_alice234567abcdef",
+            "plaintext": "forbidden_raw_content"
+          }
+        ]
+      },
+      "expected": {
+        "ok": false,
+        "error_code": "TP-AUD001"
+      }
+    }
+  ]
+}

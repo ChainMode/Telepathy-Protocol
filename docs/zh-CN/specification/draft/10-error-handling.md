@@ -61,7 +61,7 @@ TP 的错误处理设计原则：
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "<新 UUID>",
   "sender": { /* 错误返回方 */ },
   "receiver": { /* 原请求发送方 */ },

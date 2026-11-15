@@ -1,0 +1,41 @@
+{
+  "name": "@ifay/tp-sdk",
+  "version": "1.0.0",
+  "description": "Zero-dependency Node ESM reference SDK for Telepathy Protocol (TP/1.0) — RFC 8785 JCS + Ed25519 envelopes, 5-step session negotiation, 3-layer cognitive frames, LWW SharedContext, Goal DAG, and sibling/A2A/MCP bridges.",
+  "type": "module",
+  "main": "./src/index.mjs",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.mjs"
+    },
+    "./envelope": "./src/envelope.mjs",
+    "./session": "./src/session.mjs",
+    "./shared-context": "./src/shared-context.mjs",
+    "./goals": "./src/goals.mjs",
+    "./bridges": "./src/bridges.mjs"
+  },
+  "files": [
+    "src/",
+    "schemas/",
+    "vectors/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "lint": "node --check src/index.mjs src/envelope.mjs src/session.mjs src/shared-context.mjs src/goals.mjs src/bridges.mjs"
+  },
+  "keywords": [
+    "ifay",
+    "telepathy-protocol",
+    "tp-1.0",
+    "cognitive-sharing",
+    "agent-interoperability"
+  ],
+  "license": "MIT"
+}

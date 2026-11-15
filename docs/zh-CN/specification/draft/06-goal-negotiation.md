@@ -257,7 +257,7 @@ stateDiagram-v2
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000030",
   "sender": { /* fay:insurance-co-pingan */ },
   "receiver": { /* fay:patient-zhang-3389 */ },
@@ -311,7 +311,7 @@ stateDiagram-v2
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000031",
   "sender": { /* fay:patient-zhang-3389 */ },
   "receiver": { /* fay:insurance-co-pingan */ },
@@ -332,7 +332,7 @@ stateDiagram-v2
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000032",
   "sender": { /* fay:patient-zhang-3389 */ },
   "receiver": { /* fay:insurance-co-pingan */ },

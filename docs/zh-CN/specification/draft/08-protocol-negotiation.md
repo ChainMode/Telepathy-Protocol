@@ -206,7 +206,7 @@ sequenceDiagram
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000050",
   "sender": { /* fay:patient-zhang-3389 */ },
   "receiver": { /* fay:hospital-shanghai-east */ },
@@ -214,8 +214,8 @@ sequenceDiagram
   "message_type": "negotiate_request",
   "payload": {
     "candidate_transports": [
-      { "protocol": "native_tp", "endpoint": "wss://hospital-east.gov.cn/tp/v1", "version": "1.0.0" },
-      { "protocol": "a2a_jsonrpc", "endpoint": "https://hospital-east.gov.cn/a2a", "version": "1.0.0" }
+      { "protocol": "native_tp", "endpoint": "wss://hospital-east.gov.cn/tp/v1", "version": "1.0" },
+      { "protocol": "a2a_jsonrpc", "endpoint": "https://hospital-east.gov.cn/a2a", "version": "1.0" }
     ],
     "candidate_tiers": [
       "tier_2_ai_generated",
@@ -232,7 +232,7 @@ sequenceDiagram
 
 ```json
 {
-  "tp_version": "1.0.0",
+  "tp_version": "1.0",
   "message_id": "01902c4f-1a2b-7000-8000-000000000051",
   "sender": { /* fay:hospital-shanghai-east */ },
   "receiver": { /* fay:patient-zhang-3389 */ },
@@ -244,7 +244,7 @@ sequenceDiagram
     "transport_method": {
       "protocol": "native_tp",
       "endpoint": "wss://hospital-east.gov.cn/tp/v1",
-      "version": "1.0.0"
+      "version": "1.0"
     },
     "communication_tier": "tier_2_ai_generated",
     "security_level": "high",

@@ -1,39 +1,34 @@
-# IDE and editor
-.kiro/
-.vscode/
-.idea/
+# === Default: ignore everything at root (keep process/governance files local) ===
+/*
+
+# === Public deliverables (docs, schemas, vectors, reference SDK, and verification tests) ===
+!/docs/
+!/ref/
+!/schema/
+!/schemas/
+!/vectors/
+!/src/
+!/tests/
+!/package.json
+!/README.md
+!/LICENSE
+!/CONTRIBUTING.md
+!/CODE_OF_CONDUCT.md
+!/.gitignore
+!/.editorconfig
+!/.prettierrc
+!/.github/
+
+# === Exclude build/cache/OS/env noise inside allowed directories ===
+.DS_Store
 *.swp
 *.swo
-
-# OS files
-.DS_Store
+*~
 Thumbs.db
-
-# Dependencies
 node_modules/
-
-# Build output
 dist/
 build/
-
-# Environment
+coverage/
+*.tsbuildinfo
 .env
-.env.local
-
-# === iAccord 过程工具：留本地，不进 github repo ===
-# 依据 PO 裁定 D-1 / D-2（2026-08-12）：
-#   D-1 = openspec 永久留本地、只供开发团队；docs/ 是唯一公开产物。
-#   D-2 = 全 15 仓统一忽略 openspec/ 与 .kiro/。
-# 亦为组织宪章 multi-repo-coordination「过程工具不进 github repo」的落地。
-# 公开产物保持不变：docs/、schema/、README、LICENSE、CONTRIBUTING、CODE_OF_CONDUCT。
-# 注：.kiro/ 已在上方「IDE and editor」段列出，此处不重复。
-openspec/
-.dev-os/
-.cursor/
-.githooks/
-decisions/
-AGENTS.md
-
-# iAccord 本体/安装包:本体与 *.tar.gz 安装包只放体系根 .iaccord/(不在任何 repo 内)。
-# 这条是防御性的 —— 万一本仓将来自带一份 .iaccord/,也不得进 github repo。
-.iaccord/
+.env.*
