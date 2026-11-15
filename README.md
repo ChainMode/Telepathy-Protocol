@@ -1,6 +1,7 @@
 # Telepathy Protocol (TP)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Docs License: CC BY 4.0](https://img.shields.io/badge/Docs-CC%20BY%204.0-lightgrey.svg)](./LICENSE-DOCS)
 [![Wire Version](https://img.shields.io/badge/wire-TP%2F1.0-blue)](./schemas/tp-1.0.json)
 [![SDK](https://img.shields.io/badge/%40ifay%2Ftp--sdk-1.0.0-success)](./package.json)
 
@@ -93,4 +94,4 @@ npm run lint
 
 ## License
 
-Licensed under the [MIT License](./LICENSE).
+**MIT (Reference Implementations, Schemas & Test Vectors) / CC BY 4.0 (Specifications & Blueprints)** — Copyright (c) 2025-2026 ChainMode contributors. See [`LICENSE`](./LICENSE) and [`LICENSE-DOCS`](./LICENSE-DOCS).

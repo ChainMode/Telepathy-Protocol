@@ -1,247 +1,89 @@
-# Contributing to Telepathy Protocol
+# Contributing to Telepathy Protocol (TP)
 
-Thank you for your interest in contributing to the Telepathy Protocol (TP) project! This document explains how to get involved, from reporting issues to submitting pull requests.
+Thank you for your interest in contributing to **Telepathy Protocol (`TP/1.0`)** and `@ifay/tp-sdk`! This guide explains how to set up the repository, run verification suites, maintain schema and vector stability, sign off commits under DCO 1.1, and follow ecosystem terminology and dual-track licensing rules.
 
-## Table of Contents
+## Code of Conduct & Security
 
-- [Code of Conduct](#code-of-conduct)
-- [Contribution Workflow](#contribution-workflow)
-- [Commit Message Convention](#commit-message-convention)
-- [Code Review Process](#code-review-process)
-- [Issue Labels](#issue-labels)
-- [Development Setup](#development-setup)
-
-## Code of Conduct
-
-All participants in this project are expected to follow our [Code of Conduct](./CODE_OF_CONDUCT.md). Please read it before contributing.
+- All participants are expected to follow our [Code of Conduct](./CODE_OF_CONDUCT.md) (enforcement contact: **jah.g@ifay.ai**).
+- Do not open public issues or pull requests for undisclosed security vulnerabilities; report them privately per [SECURITY.md](./SECURITY.md).
 
 ## Contribution Workflow
 
-We use a standard **fork → branch → pull request** workflow.
+We use a standard **fork -> branch -> pull request** workflow.
 
-### 1. Fork the Repository
-
-Fork the repository to your own GitHub account using the "Fork" button.
-
-### 2. Clone and Set Up
+### 1. Fork and Clone
 
 ```bash
-git clone https://github.com/<your-username>/iFay-Skill.git
-cd iFay-Skill
-git remote add upstream https://github.com/<org>/iFay-Skill.git
+git clone https://github.com/<your-username>/Telepathy-Protocol.git
+cd Telepathy-Protocol
+git remote add upstream https://github.com/ChainMode/Telepathy-Protocol.git
 ```
 
-### 3. Create a Feature Branch
+### 2. Create a Topic Branch
 
-Always branch from `main`. Use a descriptive branch name:
+Branch from `main` using a clear prefix (`feat/`, `fix/`, `docs/`, `schema/`, `refactor/`, `test/`, `chore/`):
 
 ```bash
 git checkout -b feat/shared-context-lifecycle
 ```
 
-Branch naming convention:
+### 3. Verify Changes & Open a Pull Request
 
-| Prefix | Purpose |
-|--------|---------|
-| `feat/` | New feature or enhancement |
-| `fix/` | Bug fix |
-| `docs/` | Documentation changes |
-| `schema/` | Schema definition changes |
-| `refactor/` | Code refactoring (no behavior change) |
-| `test/` | Adding or updating tests |
-| `chore/` | Maintenance tasks (CI, tooling, etc.) |
+Run the zero-dependency `@ifay/tp-sdk` test and lint suites locally, sign off your commits (`git commit -s`), push your branch, and open a Pull Request against `main` using the [PR template](./.github/pull-request-template.md).
 
-### 4. Make Your Changes
+## Development Setup & Verification
 
-- Keep commits focused and atomic.
-- Follow the [commit message convention](#commit-message-convention) below.
-- Ensure your changes pass all existing tests.
-
-### 5. Push and Open a Pull Request
-
-```bash
-git push origin feat/shared-context-lifecycle
-```
-
-Open a pull request against the `main` branch of the upstream repository. Fill out the [PR template](./.github/pull-request-template.md) completely.
-
-### 6. Address Review Feedback
-
-Respond to reviewer comments and push additional commits to your branch. Avoid force-pushing after a review has started unless requested.
-
-## Commit Message Convention
-
-This project follows the [Conventional Commits](https://www.conventionalcommits.org/) specification.
-
-### Format
-
-```
-<type>(<scope>): <subject>
-
-[optional body]
-
-[optional footer(s)]
-```
-
-### Types
-
-| Type | Description |
-|------|-------------|
-| `feat` | A new feature |
-| `fix` | A bug fix |
-| `docs` | Documentation only changes |
-| `schema` | Schema definition changes (JSON/TS/MDX) |
-| `style` | Formatting, missing semicolons, etc. (no logic change) |
-| `refactor` | Code change that neither fixes a bug nor adds a feature |
-| `test` | Adding or correcting tests |
-| `chore` | Build process, CI, or auxiliary tool changes |
-| `perf` | Performance improvement |
-| `ci` | CI configuration changes |
-| `revert` | Reverts a previous commit |
-
-### Scope
-
-The scope is optional and indicates the area of the codebase affected:
-
-- `spec` — protocol specification
-- `schema` — schema definitions (JSON/TS/MDX)
-- `sdk` — TypeScript SDK
-- `blueprint` — blueprint documents
-- `docs` — general documentation
-- `i18n` — translations
-- `ci` — CI/CD pipeline
-
-### Examples
-
-```
-feat(schema): add SharedStateRef to draft schema
-
-docs(blueprint): add cross-protocol translation scenario
-
-fix(sdk): correct MessageEnvelope timestamp validation
-
-schema(draft): mark retryPolicy as optional in ConsultationRequest
-
-docs(i18n): add Japanese translation for blueprint chapter 1
-```
-
-### Breaking Changes
-
-If a commit introduces a breaking change, add `BREAKING CHANGE:` in the footer:
-
-```
-feat(schema)!: rename ContextReference to SharedContextRef
-
-BREAKING CHANGE: ContextReference has been renamed to SharedContextRef.
-Update all imports and references accordingly.
-```
-
-## Code Review Process
-
-Every pull request requires review before merging.
-
-### Review Criteria
-
-Reviewers evaluate PRs against the following criteria:
-
-1. **Correctness** — Does the change do what it claims? Are edge cases handled?
-2. **Consistency** — Does it follow existing patterns and conventions?
-3. **Schema Consistency** — For schema changes, are `schema.json`, `schema.ts`, and `schema.mdx` kept in sync?
-4. **Documentation** — Are relevant docs updated? Are new features documented?
-5. **Tests** — Are there adequate unit tests and property-based tests for new functionality?
-6. **Backward Compatibility** — Does the change break existing interfaces? If so, is a migration guide provided?
-
-### Review Flow
-
-1. Author opens a PR and fills out the PR template.
-2. At least **one maintainer** must approve the PR.
-3. For schema changes or specification changes, **two maintainers** must approve.
-4. CI checks must pass (linting, tests, schema consistency validation).
-5. Once approved, a maintainer merges the PR using **squash merge**.
-
-### Response Time
-
-- Maintainers aim to provide an initial review within **3 business days**.
-- If no review is received within 5 business days, feel free to ping in the PR comments.
-
-## Issue Labels
-
-We use the following labels to categorize and triage issues:
-
-### Type Labels
-
-| Label | Description |
-|-------|-------------|
-| `bug` | Something isn't working as expected |
-| `feature` | New feature request or enhancement |
-| `rfc` | Request for Comments — protocol evolution proposal |
-| `documentation` | Documentation improvements or additions |
-| `schema` | Related to schema definitions (JSON/TS/MDX) |
-| `translation` | Translation-related issues (new translations, outdated translations) |
-| `question` | General question about the project |
-
-### Priority Labels
-
-| Label | Description |
-|-------|-------------|
-| `priority: critical` | Blocks release or causes data loss |
-| `priority: high` | Important, should be addressed soon |
-| `priority: medium` | Normal priority |
-| `priority: low` | Nice to have, no urgency |
-
-### Status Labels
-
-| Label | Description |
-|-------|-------------|
-| `status: triage` | Needs initial assessment |
-| `status: accepted` | Accepted and ready for implementation |
-| `status: in-progress` | Currently being worked on |
-| `status: needs-info` | Waiting for more information from the reporter |
-| `status: blocked` | Blocked by another issue or external dependency |
-
-### Scope Labels
-
-| Label | Description |
-|-------|-------------|
-| `scope: spec` | Protocol specification |
-| `scope: sdk` | TypeScript SDK |
-| `scope: blueprint` | Blueprint documents |
-| `scope: ci` | CI/CD pipeline |
-| `scope: i18n` | Internationalization and translations |
-
-## Development Setup
+`@ifay/tp-sdk` is a zero-runtime-dependency Node.js ESM reference SDK built on `node:crypto`.
 
 ### Prerequisites
 
-- Node.js >= 18
-- npm or yarn
+- Node.js `>= 20.0.0`
 
-### Getting Started
+### Verification Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Run tests
+# Run full unit, property-convergence, bridge, and 21-vector conformance suite
 npm test
 
-# Run linting
+# Syntax-check all ESM SDK modules
 npm run lint
-
-# Format code
-npx prettier --write .
 ```
 
-### Schema Changes
+## Schema & Conformance Vector Discipline
 
-When modifying schema definitions, always update all three files together:
+- **Frozen `TP/1.0` Normative Baseline**: `schemas/tp-1.0.json`, `schema/2025-10-25/`, and `vectors/tp-1.0-conformance.json` are **frozen** once released. Never mutate released `1.0` schemas in ways that break wire compatibility.
+- **Additive Minor Evolution & Draft Sync**: Backward-compatible minor evolutions MUST be published as new versioned schema and vector files (for example `schemas/tp-1.1.json` and `vectors/tp-1.1-conformance.json`). When updating active draft mirrors under `schema/draft/` (`schema.json`, `schema.ts`, `schema.mdx`), update all three files together and record the change in [`schema/CHANGELOG.md`](./schema/CHANGELOG.md).
+- **Scientific Honesty & Safety Gates**: Changes MUST preserve the normative three-layer cognitive architecture (`tier_3_structured_text_fallback` mandatory fallback), `ModelHomogeneityAttestation` gating on optional experimental latent frames, **Human Prime** mandate verification (`fp_authorization_ref`), **Host** terminal handoff gating (`cap_handoff_ref`), and explicit `LossMetadata` (`semantic_loss`) bridge disclosures.
 
-1. `schema/draft/schema.json` — JSON Schema definition
-2. `schema/draft/schema.ts` — TypeScript type definitions
-3. `schema/draft/schema.mdx` — Human-readable documentation
+## Ecosystem Terminology Rules
 
-Refer to the [Schema Versioning](./schema/CHANGELOG.md) documentation for version management rules.
+All specifications, schemas, SDK code, and translations MUST use positive canonical iFay terminology:
 
----
+- **`Human Prime`** (`人类原型`): Exclusively denotes the natural person mapped and served by an `iFay`.
+- **`Host`** (`宿主`): Strictly denotes a runtime terminal hardware device or client software application.
+- **`Fay`** (`iFay` + `coFay`): Denotes an accountable digital avatar bound to a verifiable legal responsibility entity.
+- **`GMChain`** (`公誉链`) & **`MeriToken`** (`美誉值` / `Merit Unit`): Denotes the ecosystem's strictly non-monetary social contribution reputation metric.
 
-If you have questions about contributing, feel free to open an issue with the `question` label. We're happy to help!
+## Commit Message Convention & DCO 1.1 Sign-Off
+
+Follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat`, `fix`, `docs`, `schema`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `revert`) with optional scopes (`spec`, `schema`, `sdk`, `blueprint`, `docs`, `i18n`).
+
+Every commit MUST carry a **Developer Certificate of Origin v1.1 (DCO 1.1)** `Signed-off-by` trailer (`git commit -s`), certifying that you have the right to submit your contribution under https://developercertificate.org/ (no separate CLA required):
+
+```text
+feat(sdk): enforce semantic_loss metadata on MCP bridge translation
+
+Signed-off-by: Your Legal Name <you@example.com>
+```
+
+## Code Review & Issue Labels
+
+- At least **one maintainer** approval is required for code/documentation PRs, and **two maintainer** approvals for specification or schema evolutions.
+- Common issue labels: `bug`, `feature`, `rfc`, `documentation`, `schema`, `translation`, `question`.
+
+## Dual-Track Inbound = Outbound Licensing
+
+By submitting a contribution (`Inbound = Outbound`), you agree that your work is distributed under this repository's dual-track license model (`Copyright (c) 2025-2026 ChainMode contributors`):
+
+- **MIT License** ([`LICENSE`](./LICENSE)) for `@ifay/tp-sdk` reference code and tests (`src/`, `tests/`, `ref/`), machine-readable schemas (`schemas/`, `schema/`), and conformance test vectors (`vectors/`).
+- **Creative Commons Attribution 4.0 International (`CC BY 4.0`)** ([`LICENSE-DOCS`](./LICENSE-DOCS)) for protocol specifications and architectural blueprint documents under `docs/`.
