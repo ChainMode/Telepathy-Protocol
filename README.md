@@ -1,7 +1,9 @@
 # Telepathy Protocol (TP)
 
+[![Docs CI](https://github.com/ChainMode/Telepathy-Protocol/actions/workflows/docs-ci.yml/badge.svg)](https://github.com/ChainMode/Telepathy-Protocol/actions/workflows/docs-ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Docs License: CC BY 4.0](https://img.shields.io/badge/Docs-CC%20BY%204.0-lightgrey.svg)](./LICENSE-DOCS)
+[![Website: ifay.ai](https://img.shields.io/badge/Website-ifay.ai-blue)](https://ifay.ai)
 [![Wire Version](https://img.shields.io/badge/wire-TP%2F1.0-blue)](./schemas/tp-1.0.json)
 [![SDK](https://img.shields.io/badge/%40ifay%2Ftp--sdk-1.0.0-success)](./package.json)
 
