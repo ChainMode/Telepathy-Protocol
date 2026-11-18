@@ -263,7 +263,7 @@ test("SharedContextManager enforces 5-state lifecycle, delegated_access read-onl
       [ALICE_FAY_ID]: { read: true, write: true },
       [BOB_FAY_ID]: { read: true, write: false }
     }
-  });
+  }, "2026-11-16T00:03:00Z");
   assert.equal(mountRes.ok, true);
 
   const bobWrite = mgr.checkAccess("ctx_lifecycle_01", BOB_FAY_ID, "/prefs/seat", "write", "2026-11-16T00:10:00Z");
