@@ -43,12 +43,44 @@ TP 1.0 draws a strict, machine-enforced boundary between reproducible engineerin
 
 `@ifay/tp-sdk` is a zero-runtime-dependency Node.js (`>=20`) ESM reference implementation built solely on `node:crypto`.
 
+## 30-Second Runnable Quickstart (`tp-workspace` Shared Cognitive Space)
+
 ```bash
-# Run the full unit, property-convergence, bridge, and conformance vector suite
+# Spin up a live Fay-to-Fay Shared Cognitive Space server (iFay <-> project_collaborator coFay),
+# run OCC view patches, enforce Human Prime action bounds, and bridge MCP + A2A JSON-RPC
+npm run demo
+
+# Run the full 50-test unit, property-convergence, workspace, bridge, and vector suite
 npm test
 
 # Syntax check all ESM modules
 npm run lint
+```
+
+## Developer Integration (`@ifay/tp-sdk/workspace`)
+
+```js
+import {
+  TpWorkspaceEngine,
+  TpWorkspaceHttpServer,
+  TpWorkspaceClient,
+} from "@ifay/tp-sdk";
+
+const server = new TpWorkspaceHttpServer({ engine: new TpWorkspaceEngine({ mandateRegistry }) });
+const origin = await server.start();
+
+const fayAClient = new TpWorkspaceClient({ baseUrl: origin, actorFayId: fayA.identity.fay_id });
+const fayBClient = new TpWorkspaceClient({ baseUrl: origin, actorFayId: fayB.identity.fay_id });
+
+// Open mutually authorized Shared Cognitive Space (memory slices + OCC view tree + rules + audit)
+await fayAClient.openWorkspace({ workspaceId: "ws_arch_01", fayA, fayB, initialViewTree: { status: "draft" } });
+
+// Optimistic Concurrency Control (OCC) patch + object-pointer annotation (no prompt-telephone ambiguity)
+await fayBClient.applyViewPatch("ws_arch_01", {
+  baseRevision: 0,
+  operations: [{ op: "set", path: "/status", value: "approved" }],
+  objectAnnotation: { pointer_id: "ptr_status", path: "/status", note: "Verified by coFay" },
+});
 ```
 
 ### SDK Modules
@@ -60,6 +92,7 @@ npm run lint
 | [`src/shared-context.mjs`](./src/shared-context.mjs) | `@ifay/tp-sdk/shared-context` | 5-state `SharedContextManager`, deterministic LWW merge, 64KB + SSRF `CognitiveResource` guard, `X25519` + `AES-256-GCM` `SelectiveDisclosure`, `CallbackCredentialRegistry`, zero-leak `AuditChain` |
 | [`src/goals.mjs`](./src/goals.mjs) | `@ifay/tp-sdk/goals` | Acyclic sub-goal DAG validator (`TP-GOAL002`), bilateral `GoalStateMachine` (`<= 10` rounds), `ConsultationManager` (`<= 5` hops) |
 | [`src/bridges.mjs`](./src/bridges.mjs) | `@ifay/tp-sdk/bridges` | Sibling bridges (`FP` mandate check, `CAP` Host-device handoff, `DTP` tunnel stream binding, `SSP` skill schema match, `ICP` `.ctx` & encryption guard) + external `A2A` TaskCard / `MCP` Resource translators with explicit `LossMetadata` |
+| [`src/workspace.mjs`](./src/workspace.mjs) | `@ifay/tp-sdk/workspace` | `TpWorkspaceEngine`, `TpWorkspaceHttpServer`, `TpWorkspaceClient`, OCC shared view state, shared rules, delegated actions, and live `MCP`/`A2A` negotiation & bridges |
 
 ---
 

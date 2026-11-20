@@ -318,3 +318,52 @@ export declare function encodePromptEmbeddingEnvelope(
   envelope: MessageEnvelope,
   options?: { containsConfidentialPlaintext?: boolean }
 ): TpResult<{ promptBlock: string; lossMetadata: LossMetadata }>;
+
+export declare function negotiatePeerBridgeMode(options?: {
+  localProtocols?: string[];
+  peerProtocols?: string[];
+  sharedOntologyMatch?: boolean;
+}): TpResult<{
+  selectedProtocol: string;
+  communicationTier: string;
+  lossless: boolean;
+  lossMetadata: LossMetadata | null;
+}>;
+
+export declare class TpWorkspaceEngine {
+  constructor(options?: { mandateRegistry?: Map<string, Record<string, unknown>> | Record<string, Record<string, unknown>> });
+  registerMandate(fpAuthorizationRef: string, mandateRecord: Record<string, unknown>): void;
+  openWorkspace(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  mountMemorySlice(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  applyViewPatch(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  addSharedRule(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  registerActionHandler(workspaceId: string, actionKey: string, fn: (ctx: Record<string, unknown>) => unknown): void;
+  delegateActionPermission(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  executeDelegatedAction(params: Record<string, unknown>): Promise<TpResult<Record<string, unknown>>>;
+  revokeDelegatedCredential(params: Record<string, unknown>): TpResult;
+  handleMcpBridgeCall(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  handleA2aJsonRpc(params: Record<string, unknown>): TpResult<Record<string, unknown>>;
+  getSnapshot(workspaceId: string): TpResult<{ snapshot: Record<string, unknown> }>;
+}
+
+export declare class TpWorkspaceHttpServer {
+  constructor(options?: { engine?: TpWorkspaceEngine; host?: string; port?: number });
+  start(): Promise<string>;
+  stop(): Promise<void>;
+}
+
+export declare class TpWorkspaceClient {
+  constructor(options: { baseUrl: string; actorFayId: string });
+  openWorkspace(params: Record<string, unknown>): Promise<Record<string, unknown>>;
+  getSnapshot(workspaceId: string): Promise<Record<string, unknown>>;
+  mountMemorySlice(workspaceId: string, params: Record<string, unknown>): Promise<Record<string, unknown>>;
+  applyViewPatch(workspaceId: string, params: Record<string, unknown>): Promise<Record<string, unknown>>;
+  delegateActionPermission(workspaceId: string, params: Record<string, unknown>): Promise<Record<string, unknown>>;
+  executeDelegatedAction(workspaceId: string, params: Record<string, unknown>): Promise<Record<string, unknown>>;
+  revokeCredential(workspaceId: string, credentialId: string, reason?: string): Promise<Record<string, unknown>>;
+  callMcpBridge(workspaceId: string, method: string, params?: Record<string, unknown>): Promise<Record<string, unknown>>;
+  callA2aJsonRpc(workspaceId: string, jsonRpcRequest: Record<string, unknown>): Promise<Record<string, unknown>>;
+}
+
+export declare function createDemoWorkspaceParticipants(): Record<string, unknown>;
+export declare function runTpWorkspaceDemo(options?: { silent?: boolean }): Promise<Record<string, unknown>>;
