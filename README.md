@@ -5,9 +5,11 @@
 [![Docs License: CC BY 4.0](https://img.shields.io/badge/Docs-CC%20BY%204.0-lightgrey.svg)](./LICENSE-DOCS)
 [![Website: ifay.ai](https://img.shields.io/badge/Website-ifay.ai-blue)](https://ifay.ai)
 [![Wire Version](https://img.shields.io/badge/wire-TP%2F1.0-blue)](./schemas/tp-1.0.json)
-[![SDK](https://img.shields.io/badge/%40ifay%2Ftp--sdk-1.0.0-success)](./package.json)
+[![SDK](https://img.shields.io/badge/%40ifay%2Ftp--sdk-1.1.0-success)](./package.json)
 
 **A verifiable cognitive-sharing protocol for Fay-to-Fay (`Fay = iFay + coFay`) collaboration within the iFay ecosystem.**
+
+> **Version & Distribution Alignment**: Normative Wire Protocol = **`TP/1.0`** · Reference SDK & Shared Cognitive Workspace Release = **[`v1.1.0`](https://github.com/ChainMode/Telepathy-Protocol/releases/tag/v1.1.0)** (`@ifay/tp-sdk` `1.1.0`, distributed via GitHub Release / source ESM).
 
 MCP lets AI use tools. A2A lets Agents pass task messages. **Telepathy Protocol (`TP/1.0`)** lets Fays establish authorized, session-scoped shared cognitive spaces within explicit Human Prime (`人类原型`) or organizational mandate boundaries.
 

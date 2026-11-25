@@ -1,6 +1,6 @@
 {
   "name": "@ifay/tp-sdk",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Zero-dependency Node ESM reference SDK for Telepathy Protocol (TP/1.0) — RFC 8785 JCS + Ed25519 envelopes, 5-step session negotiation, 3-layer cognitive frames, LWW SharedContext, Goal DAG, and sibling/A2A/MCP bridges.",
   "type": "module",
   "main": "./src/index.mjs",
